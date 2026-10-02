@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="English calendar for 2026-2027 with Nepali BS dates and holidays">
+<title>Patro 2026–2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: wall-calendar sheet — header strip, month chips, 7-col grid beside a holiday ledger; stacks on phones */
+:root{
+  --paper:#f6f6f3; --sheet:#ffffff; --ink:#1b1f2b; --muted:#6a6e7a; --line:#e3e2dc;
+  --crimson:#c0122f; --crimson-soft:#fbe7ea; --navy:#1f3a6e; --navy-soft:#e7ecf6;
+  --gold:#b7791f; --gold-soft:#fdf1dc; --today:#1f3a6e;
+  --display:"Rozha One", "Georgia", serif;
+  --body:"Mukta", "Segoe UI", system-ui, sans-serif;
+  --shadow:0 1px 2px rgba(20,25,40,.05), 0 8px 24px rgba(20,25,40,.06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#12141b; --sheet:#1a1d26; --ink:#eceae4; --muted:#9a9ca6; --line:#2c303c;
+  --crimson:#ff5a6e; --crimson-soft:#3a1a22; --navy:#8fb0ff; --navy-soft:#1e2944;
+  --gold:#f0b54d; --gold-soft:#3a2d16; --today:#8fb0ff;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#12141b; --sheet:#1a1d26; --ink:#eceae4; --muted:#9a9ca6; --line:#2c303c;
+  --crimson:#ff5a6e; --crimson-soft:#3a1a22; --navy:#8fb0ff; --navy-soft:#1e2944;
+  --gold:#f0b54d; --gold-soft:#3a2d16; --today:#8fb0ff;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 40px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,.cell:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:14px}
+.brand h1{font-family:var(--display);font-weight:400;font-size:clamp(1.9rem,4vw,2.6rem);line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.brand h1 .np{color:var(--crimson)}
+.brand p{margin:.35rem 0 0;color:var(--muted);font-size:.92rem}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--sheet);padding:3px}
+.seg button{border:0;background:none;padding:.3rem .95rem;border-radius:999px;font-weight:600;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.btn{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:.35rem .9rem;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+
+.next{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;background:var(--gold-soft);border:1px solid color-mix(in srgb,var(--gold) 35%,transparent);border-radius:10px;padding:.55rem .9rem;margin-bottom:14px;font-size:.93rem}
+.next b{color:var(--gold)}
+.next .cd{font-variant-numeric:tabular-nums;font-weight:700}
+
+/* month chips */
+.chips{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-bottom:14px}
+.chips button{border:1px solid transparent;background:none;border-radius:8px;padding:.35rem 0;font-weight:600;font-size:.88rem;color:var(--muted);position:relative}
+.chips button:hover{background:var(--sheet);border-color:var(--line)}
+.chips button[aria-current="true"]{background:var(--sheet);border-color:var(--ink);color:var(--ink)}
+.chips button .pip{position:absolute;left:50%;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--crimson);transform:translateX(-50%)}
+.chips button .pip.maj{background:var(--gold);width:6px;height:6px;bottom:2px}
+
+/* main */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;min-width:0}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px 12px;border-bottom:1px solid var(--line)}
+.sheet-head .t{min-width:0}
+.sheet-head h2{font-family:var(--display);font-weight:400;font-size:1.75rem;line-height:1.05;margin:0}
+.sheet-head h2 span{color:var(--muted);font-family:var(--body);font-size:1rem;font-weight:500;margin-left:.3rem}
+.sheet-head .bs{color:var(--crimson);font-weight:600;font-size:.95rem;margin-top:2px}
+.nav{display:flex;gap:6px}
+.nav button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--sheet);font-size:1.1rem;line-height:1}
+.nav button:disabled{opacity:.35;cursor:default}
+
+.dow{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--line)}
+.dow div{padding:.45rem .5rem;font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;font-weight:600;color:var(--muted);display:flex;justify-content:space-between;gap:4px}
+.dow div .n{letter-spacing:0;text-transform:none;font-weight:500}
+.dow div:first-child,.dow div:last-child{color:var(--crimson)}
+.grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cell{position:relative;min-height:104px;padding:6px 7px 6px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:none;text-align:left;display:flex;flex-direction:column;gap:3px;min-width:0;border-top:0;border-left:0}
+.cell:nth-child(7n){border-right:0}
+.cell.pad{background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--line) 45%,transparent) 6px 7px);cursor:default}
+.cell:not(.pad):hover{background:color-mix(in srgb,var(--navy-soft) 55%,transparent)}
+.cell .row{display:flex;justify-content:space-between;align-items:flex-start;gap:4px}
+.cell .ad{font-weight:700;font-size:1.3rem;line-height:1;font-variant-numeric:tabular-nums}
+.cell .bsd{font-size:.8rem;color:var(--muted);line-height:1.1;text-align:right;white-space:nowrap}
+.cell .bsd .m{display:block;font-size:.66rem;color:var(--crimson);font-weight:600}
+.cell .hol{font-size:.72rem;line-height:1.2;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:auto}
+.cell .hol.more{color:var(--muted);font-weight:500;-webkit-line-clamp:1}
+.cell.sat .ad,.cell.public .ad{color:var(--crimson)}
+.cell.public{background:var(--crimson-soft)}
+.cell.public .hol{color:var(--crimson)}
+.cell.major{background:var(--gold-soft)}
+.cell.major .ad{color:var(--crimson)}
+.cell.major .hol{color:var(--gold)}
+.cell.major::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--gold)}
+.cell.limited .hol{color:var(--navy)}
+.cell.obs .hol{color:var(--muted)}
+.cell.today{box-shadow:inset 0 0 0 2px var(--today)}
+.cell.today .ad::after{content:"Today";display:inline-block;margin-left:5px;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sheet);background:var(--today);padding:1px 5px;border-radius:4px;vertical-align:middle}
+.cell.sel{outline:2px solid var(--ink);outline-offset:-2px}
+.dots{display:none;gap:3px;margin-top:auto}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--crimson)}
+.dots i.major{background:var(--gold)} .dots i.limited{background:var(--navy)} .dots i.obs{background:var(--muted)}
+
+/* side ledger */
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.panel h3{margin:0 0 8px;font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.detail .big{font-family:var(--display);font-size:1.5rem;line-height:1.1}
+.detail .bsfull{color:var(--crimson);font-weight:600;margin-top:2px}
+.detail .bsrom{color:var(--muted);font-size:.85rem}
+.detail ul{margin:10px 0 0}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.list li{display:grid;grid-template-columns:44px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--line);cursor:pointer}
+.list li:first-child{border-top:0}
+.list li:hover .nm{text-decoration:underline}
+.list .dt{text-align:center;line-height:1.05}
+.list .dt b{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums}
+.list .dt small{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.list .nm{font-weight:600;font-size:.92rem;line-height:1.25}
+.list .sub{font-size:.8rem;color:var(--muted)}
+.tag{display:inline-block;font-size:.64rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:4px;margin-right:4px;vertical-align:1px}
+.tag.major{background:var(--gold-soft);color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent)}
+.tag.public{background:var(--crimson-soft);color:var(--crimson)}
+.tag.limited{background:var(--navy-soft);color:var(--navy)}
+.tag.obs{background:color-mix(in srgb,var(--line) 70%,transparent);color:var(--muted)}
+.tag.est{background:none;border:1px dashed var(--muted);color:var(--muted)}
+.empty{color:var(--muted);font-size:.9rem;margin:0}
+.legend{display:grid;gap:6px;font-size:.84rem}
+.legend div{display:flex;gap:8px;align-items:center}
+.sw{width:14px;height:14px;border-radius:4px;flex:none;border:1px solid var(--line)}
+.sw.major{background:var(--gold-soft);border-top:3px solid var(--gold)}
+.sw.public{background:var(--crimson-soft)}
+.sw.limited{background:var(--navy-soft)}
+.sw.sat{background:var(--sheet);position:relative}
+.sw.sat::after{content:"6";position:absolute;inset:0;display:grid;place-items:center;font-size:.6rem;font-weight:700;color:var(--crimson)}
+.note{font-size:.78rem;color:var(--muted);margin:8px 0 0}
+
+@media (max-width:900px){
+  .main{grid-template-columns:minmax(0,1fr)}
+  .chips{grid-template-columns:repeat(6,1fr)}
+}
+@media (max-width:620px){
+  .cell{min-height:64px;padding:4px 4px}
+  .cell .ad{font-size:1rem}
+  .cell.today .ad::after{display:none}
+  .cell .bsd{font-size:.7rem}
+  .cell .bsd .m{font-size:.56rem}
+  .cell .hol{display:none}
+  .dots{display:flex}
+  .dow div{padding:.4rem .3rem;font-size:.66rem}
+  .dow div .n{display:none}
+  .sheet-head h2{font-size:1.4rem}
+}
+@media (prefers-reduced-motion:no-preference){.cell,.chips button{transition:background-color .15s}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Patro <span class="np">पात्रो</span></h1>
+      <p>English months, Bikram Sambat dates and Nepali holidays · 2026–2027 AD</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Year">
+        <button id="y2026" data-year="2026">2026</button>
+        <button id="y2027" data-year="2027">2027</button>
+      </div>
+      <button class="btn" id="todayBtn">Today</button>
+    </div>
+  </header>
+
+  <div class="next" id="next" hidden></div>
+
+  <nav class="chips" id="chips" aria-label="Months"></nav>
+
+  <div class="main">
+    <section class="sheet" aria-live="polite">
+      <div class="sheet-head">
+        <div class="t">
+          <h2 id="mTitle"></h2>
+          <div class="bs" id="mBs"></div>
+        </div>
+        <div class="nav">
+          <button id="prev" aria-label="Previous month">‹</button>
+          <button id="nextM" aria-label="Next month">›</button>
+        </div>
+      </div>
+      <div class="dow" id="dow"></div>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <aside class="side">
+      <div class="panel detail" id="detail"></div>
+      <div class="panel">
+        <h3 id="listTitle">Holidays this month</h3>
+        <ul class="list" id="list"></ul>
+      </div>
+      <div class="panel">
+        <h3>Key</h3>
+        <div class="legend">
+          <div><span class="sw public"></span>Public holiday (incl. Dashain &amp; Tihar)</div>
+          <div><span class="sw limited"></span>Holiday for some groups or areas</div>
+          <div><span class="sw sat"></span>Saturday &amp; Sunday (weekly holidays)</div>
+          <div><span class="tag est">est.</span>Expected date; 2084 BS list not yet gazetted</div>
+        </div>
+        <p class="note">Dates up to Chaitra 2083 (Apr 13, 2027) follow the government holiday list. Later lunar festivals are calculated and may shift by a day.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+// ---------- Bikram Sambat conversion ----------
+// Month lengths (Baisakh..Chaitra). Anchor: 2082 Baisakh 1 = 2025-04-14.
+const BS_DATA = {
+  2082:[31,31,32,31,31,31,30,29,30,29,30,30],
+  2083:[31,31,32,31,31,31,30,29,30,29,30,30],
+  2084:[31,32,31,32,31,30,30,30,29,29,30,31]
+};
+const ANCHOR = Date.UTC(2025,3,14);
+const BS_MONTHS = ["Baisakh","Jestha","Asar","Shrawan","Bhadra","Ashoj","Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"];
+const BS_MONTHS_NP = ["बैशाख","जेठ","असार","साउन","भदौ","असोज","कार्तिक","मंसिर","पुष","माघ","फागुन","चैत"];
+const NP_DIG = "०१२३४५६७८९";
+const np = n => String(n).replace(/\d/g,d=>NP_DIG[d]);
+
+function toBS(y,m,d){ // m 0-based
+  let days = Math.round((Date.UTC(y,m,d)-ANCHOR)/864e5);
+  let by = 2082, bm = 0;
+  while (true){
+    const len = BS_DATA[by][bm];
+    if (days < len) return {y:by, m:bm, d:days+1};
+    days -= len; bm++;
+    if (bm===12){ bm=0; by++; }
+  }
+}
+
+// ---------- Holidays ----------
+// t: major = Dashain/Tihar, public = national holiday, limited = specific groups/areas, obs = festival (no general holiday)
+// est: lunar date calculated, official 2084 BS list not yet published
+const H = [
+  // 2082 BS (Jan–Apr 2026)
+  ["2026-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public"],
+  ["2026-01-15","Maghe Sankranti","माघे संक्रान्ति","public"],
+  ["2026-01-19","Sonam Lhosar","सोनाम ल्होछार","public"],
+  ["2026-01-23","Basanta Panchami (Saraswati Puja)","वसन्तपञ्चमी","limited","Schools only"],
+  ["2026-01-30","Martyrs' Day","शहीद दिवस","public"],
+  ["2026-02-15","Maha Shivaratri","महाशिवरात्रि","public"],
+  ["2026-02-18","Gyalpo Lhosar","ग्याल्पो ल्होसार","public"],
+  ["2026-02-19","Democracy Day","प्रजातन्त्र दिवस","public"],
+  ["2026-03-02","Fagu Purnima (Holi, hills)","फागु पूर्णिमा","public","Hill & Himalayan districts"],
+  ["2026-03-03","Holi (Terai)","होली","public","Terai districts"],
+  ["2026-03-04","Election holiday","चुनाव बिदा","public"],
+  ["2026-03-05","House of Representatives election","प्रतिनिधिसभा निर्वाचन","public"],
+  ["2026-03-06","Election holiday","चुनाव बिदा","public"],
+  ["2026-03-08","International Women's Day","नारी दिवस","limited","Women only"],
+  ["2026-03-18","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley"],
+  ["2026-03-21","Eid ul-Fitr","ईद उल फितर","public"],
+  ["2026-03-27","Ram Navami","राम नवमी","obs"],
+  // 2083 BS
+  ["2026-04-14","Nepali New Year 2083 · Bisket Jatra","नयाँ वर्ष २०८३","public"],
+  ["2026-05-01","Buddha Jayanti · Labour Day · Ubhauli","बुद्ध जयन्ती","public"],
+  ["2026-05-28","Bakar Eid (Eid al-Adha)","बकर ईद","public"],
+  ["2026-05-29","Republic Day","गणतन्त्र दिवस","public"],
+  ["2026-06-20","Bhoto Jatra","भोटो जात्रा","limited","Kathmandu Valley"],
+  ["2026-08-26","Prophet Muhammad's Birthday","पैगम्बर मोहम्मद जयन्ती","limited","Muslim community"],
+  ["2026-08-28","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public"],
+  ["2026-08-29","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley"],
+  ["2026-09-04","Krishna Janmashtami · Gaura Parva","श्रीकृष्ण जन्माष्टमी","public"],
+  ["2026-09-08","Gen Z Martyrs' Day","जेनजी शहीद दिवस","public"],
+  ["2026-09-14","Haritalika Teej","हरितालिका तीज","limited","Women only"],
+  ["2026-09-19","Constitution Day","संविधान दिवस","public"],
+  ["2026-09-25","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley"],
+  ["2026-10-04","Jitiya Parva","जितिया पर्व","limited","Women only"],
+  ["2026-10-11","Ghatasthapana","घटस्थापना","major","Dashain begins"],
+  ["2026-10-17","Fulpati","फूलपाती","major","Dashain"],
+  ["2026-10-18","Maha Ashtami","महाअष्टमी","major","Dashain"],
+  ["2026-10-19","Dashain holiday","दशैं बिदा","major","Dashain"],
+  ["2026-10-20","Maha Navami","महानवमी","major","Dashain"],
+  ["2026-10-21","Vijaya Dashami (Tika)","विजया दशमी","major","Dashain"],
+  ["2026-10-22","Papankusha Ekadashi","पापांकुशा एकादशी","major","Dashain"],
+  ["2026-10-23","Dashain holiday","दशैं बिदा","major","Dashain"],
+  ["2026-10-26","Kojagrat Purnima","कोजाग्रत पूर्णिमा","obs","End of Dashain"],
+  ["2026-11-07","Kag Tihar","काग तिहार","major","Tihar"],
+  ["2026-11-08","Kukur Tihar · Laxmi Puja","कुकुर तिहार / लक्ष्मी पूजा","major","Tihar"],
+  ["2026-11-09","Gai Puja · Tihar holiday","गाई पूजा","major","Tihar"],
+  ["2026-11-10","Govardhan Puja · Mha Puja · Nepal Sambat 1147","गोवर्धन पूजा / म्ह पूजा","major","Tihar"],
+  ["2026-11-11","Bhai Tika","भाइटीका","major","Tihar"],
+  ["2026-11-12","Tihar holiday","तिहार बिदा","major","Tihar"],
+  ["2026-11-15","Chhath Parva","छठ पर्व","public"],
+  ["2026-11-24","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community"],
+  ["2026-12-03","Int'l Day of Persons with Disabilities","अपाङ्ग दिवस","limited","Persons with disabilities"],
+  ["2026-12-24","Udhauli Parva · Yomari Punhi","उधौली पर्व / योमरी पुन्ही","public"],
+  ["2026-12-25","Christmas","क्रिसमस","public"],
+  ["2026-12-30","Tamu Lhosar","तमु ल्होसार","public"],
+  ["2027-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public"],
+  ["2027-01-15","Maghe Sankranti","माघे संक्रान्ति","public"],
+  ["2027-01-30","Martyrs' Day","शहीद दिवस","public"],
+  ["2027-02-07","Sonam Lhosar","सोनाम ल्होछार","public"],
+  ["2027-02-11","Basanta Panchami (Saraswati Puja)","वसन्तपञ्चमी","limited","Schools only"],
+  ["2027-02-19","Democracy Day","प्रजातन्त्र दिवस","public"],
+  ["2027-03-06","Maha Shivaratri","महाशिवरात्रि","public"],
+  ["2027-03-08","International Women's Day","नारी दिवस","limited","Women only"],
+  ["2027-03-09","Gyalpo Lhosar","ग्याल्पो ल्होसार","public"],
+  ["2027-03-10","Eid ul-Fitr","ईद उल फितर","public","",1],
+  ["2027-03-21","Fagu Purnima (Holi, hills)","फागु पूर्णिमा","public","Hill & Himalayan districts"],
+  ["2027-03-22","Holi (Terai)","होली","public","Terai districts"],
+  ["2027-04-06","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley"],
+  // 2084 BS (Apr–Dec 2027) — fixed solar dates exact, lunar dates estimated
+  ["2027-04-14","Nepali New Year 2084 · Bisket Jatra","नयाँ वर्ष २०८४","public"],
+  ["2027-04-15","Ram Navami","राम नवमी","obs","",1],
+  ["2027-05-01","Labour Day","श्रमिक दिवस","public"],
+  ["2027-05-17","Bakar Eid (Eid al-Adha)","बकर ईद","public","",1],
+  ["2027-05-20","Buddha Jayanti · Ubhauli","बुद्ध जयन्ती","public","",1],
+  ["2027-05-29","Republic Day","गणतन्त्र दिवस","public"],
+  ["2027-08-15","Prophet Muhammad's Birthday","पैगम्बर मोहम्मद जयन्ती","limited","Muslim community",1],
+  ["2027-08-17","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public","",1],
+  ["2027-08-18","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",1],
+  ["2027-08-25","Krishna Janmashtami","श्रीकृष्ण जन्माष्टमी","public","",1],
+  ["2027-09-03","Haritalika Teej","हरितालिका तीज","limited","Women only",1],
+  ["2027-09-09","Gen Z Martyrs' Day","जेनजी शहीद दिवस","public"],
+  ["2027-09-14","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",1],
+  ["2027-09-20","Constitution Day","संविधान दिवस","public"],
+  ["2027-09-30","Ghatasthapana","घटस्थापना","major","Dashain begins",1],
+  ["2027-10-06","Fulpati","फूलपाती","major","Dashain",1],
+  ["2027-10-07","Maha Ashtami","महाअष्टमी","major","Dashain",1],
+  ["2027-10-08","Maha Navami","महानवमी","major","Dashain",1],
+  ["2027-10-09","Vijaya Dashami (Tika)","विजया दशमी","major","Dashain",1],
+  ["2027-10-10","Ekadashi · Dashain holiday","एकादशी","major","Dashain",1],
+  ["2027-10-15","Kojagrat Purnima","कोजाग्रत पूर्णिमा","obs","End of Dashain",1],
+  ["2027-10-27","Kag Tihar","काग तिहार","major","Tihar",1],
+  ["2027-10-28","Kukur Tihar","कुकुर तिहार","major","Tihar",1],
+  ["2027-10-29","Laxmi Puja · Gai Puja","लक्ष्मी पूजा","major","Tihar",1],
+  ["2027-10-30","Govardhan Puja · Mha Puja · Nepal Sambat 1148","गोवर्धन पूजा / म्ह पूजा","major","Tihar",1],
+  ["2027-10-31","Bhai Tika","भाइटीका","major","Tihar",1],
+  ["2027-11-04","Chhath Parva","छठ पर्व","public","",1],
+  ["2027-11-14","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",1],
+  ["2027-12-03","Int'l Day of Persons with Disabilities","अपाङ्ग दिवस","limited","Persons with disabilities"],
+  ["2027-12-13","Udhauli Parva · Yomari Punhi","उधौली पर्व / योमरी पुन्ही","public","",1],
+  ["2027-12-25","Christmas","क्रिसमस","public"],
+  ["2027-12-31","Tamu Lhosar","तमु ल्होसार","public"],
+].map(([d,n,npn,t,note,est])=>({d,n,np:npn,t:t==="major"?"public":t,note:note||"",est:!!est}));
+const RANK = {major:0, public:1, limited:2, obs:3};
+const byDate = {};
+H.forEach(h=>{(byDate[h.d] ||= []).push(h)});
+Object.values(byDate).forEach(a=>a.sort((x,y)=>RANK[x.t]-RANK[y.t]));
+
+// ---------- UI ----------
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MON = MONTHS.map(m=>m.slice(0,3));
+const DOW = [["Sun","आइत"],["Mon","सोम"],["Tue","मंगल"],["Wed","बुध"],["Thu","बिही"],["Fri","शुक्र"],["Sat","शनि"]];
+const key = (y,m,d)=>`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+const $ = id=>document.getElementById(id);
+
+const now = new Date();
+const TODAY = key(now.getFullYear(), now.getMonth(), now.getDate());
+const inRange = now.getFullYear()>=2026 && now.getFullYear()<=2027;
+
+let state = {y: inRange?now.getFullYear():2026, m: inRange?now.getMonth():0, sel: inRange?TODAY:"2026-01-01"};
+try{ const s=JSON.parse(localStorage.getItem("patro-view")); if(s && s.y>=2026 && s.y<=2027 && !inRange) state={...state,...s}; }catch(e){}
+
+$("dow").innerHTML = DOW.map(([e,n])=>`<div><span>${e}</span><span class="n">${n}</span></div>`).join("");
+
+function bsLabel(b){ return `${BS_MONTHS_NP[b.m]} ${np(b.d)}, ${np(b.y)}`; }
+
+function render(){
+  const {y,m} = state;
+  try{ localStorage.setItem("patro-view", JSON.stringify({y,m})); }catch(e){}
+  $("y2026").setAttribute("aria-pressed", y===2026);
+  $("y2027").setAttribute("aria-pressed", y===2027);
+  $("prev").disabled = (y===2026 && m===0);
+  $("nextM").disabled = (y===2027 && m===11);
+
+  // chips
+  $("chips").innerHTML = MON.map((mn,i)=>{
+    const ks = Object.keys(byDate).filter(k=>k.startsWith(`${y}-${String(i+1).padStart(2,"0")}`));
+    const maj = ks.some(k=>byDate[k].some(h=>h.t==="major"));
+    const pub = ks.some(k=>byDate[k].some(h=>h.t==="public"));
+    return `<button data-m="${i}" ${i===m?'aria-current="true"':''}>${mn}${maj?'<span class="pip maj"></span>':pub?'<span class="pip"></span>':''}</button>`;
+  }).join("");
+
+  // title + BS span
+  const days = new Date(y,m+1,0).getDate();
+  const b1 = toBS(y,m,1), b2 = toBS(y,m,days);
+  $("mTitle").innerHTML = `${MONTHS[m]}<span>${y}</span>`;
+  $("mBs").textContent = b1.y===b2.y
+    ? `${BS_MONTHS_NP[b1.m]} – ${BS_MONTHS_NP[b2.m]} ${np(b1.y)} · ${BS_MONTHS[b1.m]} – ${BS_MONTHS[b2.m]} ${b1.y} BS`
+    : `${BS_MONTHS_NP[b1.m]} ${np(b1.y)} – ${BS_MONTHS_NP[b2.m]} ${np(b2.y)} · ${BS_MONTHS[b1.m]} ${b1.y} – ${BS_MONTHS[b2.m]} ${b2.y} BS`;
+
+  // grid
+  const first = new Date(y,m,1).getDay();
+  let html = "";
+  for(let i=0;i<first;i++) html += `<div class="cell pad" aria-hidden="true"></div>`;
+  for(let d=1; d<=days; d++){
+    const k = key(y,m,d), b = toBS(y,m,d), hs = byDate[k]||[];
+    const dow = (first+d-1)%7;
+    const cls = ["cell"];
+    if(dow===6||dow===0) cls.push("sat");
+    if(hs.length) cls.push(hs[0].t);
+    if(k===TODAY) cls.push("today");
+    if(k===state.sel) cls.push("sel");
+    const showM = b.d===1 || d===1;
+    const label = hs.length ? `<div class="hol">${hs[0].n}</div>${hs.length>1?`<div class="hol more">+${hs.length-1} more</div>`:""}` : "";
+    const dots = hs.length ? `<div class="dots">${hs.map(h=>`<i class="${h.t}"></i>`).join("")}</div>` : "";
+    const aria = `${MONTHS[m]} ${d}, ${BS_MONTHS[b.m]} ${b.d} ${b.y} BS${hs.length?": "+hs.map(h=>h.n).join(", "):""}`;
+    html += `<button class="${cls.join(" ")}" data-k="${k}" aria-label="${aria}">
+      <div class="row"><span class="ad">${d}</span><span class="bsd">${showM?`<span class="m">${BS_MONTHS_NP[b.m]}</span>`:""}${np(b.d)}</span></div>
+      ${label}${dots}</button>`;
+  }
+  const tail = (7 - (first+days)%7)%7;
+  for(let i=0;i<tail;i++) html += `<div class="cell pad" aria-hidden="true"></div>`;
+  $("grid").innerHTML = html;
+
+  // month list
+  const ks = Object.keys(byDate).filter(k=>k.startsWith(`${y}-${String(m+1).padStart(2,"0")}`)).sort();
+  $("listTitle").textContent = `Holidays in ${MONTHS[m]}`;
+  $("list").innerHTML = ks.length ? ks.flatMap(k=>byDate[k].map(h=>{
+    const dd = +k.slice(8), b = toBS(y,m,dd);
+    const wd = DOW[new Date(y,m,dd).getDay()][0];
+    return `<li data-k="${k}"><div class="dt"><b>${dd}</b><small>${wd}</small></div>
+      <div><div class="nm">${h.n}</div>
+      <div class="sub">${h.np} · ${BS_MONTHS_NP[b.m]} ${np(b.d)}</div>
+      <div style="margin-top:3px"><span class="tag ${h.t}">${tagName(h.t)}</span>${h.note?`<span class="sub">${h.note}</span>`:""}${h.est?` <span class="tag est">est.</span>`:""}</div></div></li>`;
+  })).join("") : `<li style="cursor:default"><p class="empty" style="grid-column:1/-1">No holidays this month apart from weekends.</p></li>`;
+
+  renderDetail();
+}
+
+function tagName(t){ return {major:"Dashain/Tihar",public:"Public holiday",limited:"Limited",obs:"Festival"}[t]; }
+
+function renderDetail(){
+  const k = state.sel; const [y,mm,d] = k.split("-").map(Number); const m=mm-1;
+  const b = toBS(y,m,d), hs = byDate[k]||[];
+  const wd = new Date(y,m,d);
+  const wdName = wd.toLocaleDateString("en-GB",{weekday:"long"});
+  $("detail").innerHTML = `<h3>${k===TODAY?"Today":"Selected day"}</h3>
+    <div class="big">${wdName}, ${MON[m]} ${d}, ${y}</div>
+    <div class="bsfull">${bsLabel(b)} · ${DOW[wd.getDay()][1]}बार</div>
+    <div class="bsrom">${BS_MONTHS[b.m]} ${b.d}, ${b.y} BS</div>
+    ${hs.length?`<ul class="list" style="margin-top:8px">${hs.map(h=>`<li style="cursor:default;grid-template-columns:1fr"><div><div class="nm">${h.n}</div><div class="sub">${h.np}</div><div style="margin-top:3px"><span class="tag ${h.t}">${tagName(h.t)}</span>${h.note?`<span class="sub">${h.note}</span>`:""}${h.est?` <span class="tag est">est.</span>`:""}</div></div></li>`).join("")}</ul>`
+      : `<p class="empty" style="margin-top:8px">${wd.getDay()===6?"Saturday, weekly holiday.":wd.getDay()===0?"Sunday, weekly holiday.":"Regular working day."}</p>`}`;
+}
+
+function renderNext(){
+  if(!inRange) return;
+  const up = Object.keys(byDate).filter(k=>k>=TODAY && byDate[k].some(h=>h.t==="major"||h.t==="public")).sort()[0];
+  if(!up) return;
+  const h = byDate[up].find(h=>h.t==="major"||h.t==="public");
+  const [y,m,d] = up.split("-").map(Number);
+  const diff = Math.round((Date.UTC(y,m-1,d)-Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
+  const b = toBS(y,m-1,d);
+  $("next").hidden = false;
+  $("next").innerHTML = `<span>Next holiday</span><b>${h.n}</b><span>${MON[m-1]} ${d} · ${bsLabel(b)}</span><span class="cd">${diff===0?"Today":diff===1?"Tomorrow":`in ${diff} days`}</span>`;
+  $("next").style.cursor="pointer";
+  $("next").onclick = ()=>go(up);
+}
+
+function go(k){ const [y,m]=k.split("-").map(Number); state={y,m:m-1,sel:k}; render(); }
+
+$("chips").addEventListener("click",e=>{const b=e.target.closest("button"); if(b){state.m=+b.dataset.m; render();}});
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{state.y=+b.dataset.year; render();}));
+$("prev").onclick=()=>{ if(state.m===0){state.y--;state.m=11}else state.m--; render(); };
+$("nextM").onclick=()=>{ if(state.m===11){state.y++;state.m=0}else state.m++; render(); };
+$("todayBtn").onclick=()=>{ inRange ? go(TODAY) : go("2026-01-01"); };
+$("grid").addEventListener("click",e=>{const c=e.target.closest(".cell[data-k]"); if(c){state.sel=c.dataset.k; render();}});
+$("list").addEventListener("click",e=>{const li=e.target.closest("li[data-k]"); if(li){state.sel=li.dataset.k; render();}});
+document.addEventListener("keydown",e=>{
+  if(e.target.closest("input,textarea")) return;
+  if(e.key==="ArrowLeft" && !$("prev").disabled) $("prev").click();
+  if(e.key==="ArrowRight" && !$("nextM").disabled) $("nextM").click();
+});
+
+renderNext();
+render();
+</script>
+</body>
+</html>
