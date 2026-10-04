@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="English calendar for 2026-2027 with Nepali BS dates and holidays">
-<title>Patro 2026–2027</title>
+<meta name="description" content="English calendar for 2020-2030 with Nepali BS dates and holidays">
+<title>Patro 2020–2030</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&display=swap">
@@ -41,9 +41,11 @@ button:focus-visible,.cell:focus-visible{outline:2px solid var(--navy);outline-o
 .brand h1 .np{color:var(--crimson)}
 .brand p{margin:.35rem 0 0;color:var(--muted);font-size:.92rem}
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--sheet);padding:3px}
-.seg button{border:0;background:none;padding:.3rem .95rem;border-radius:999px;font-weight:600;font-variant-numeric:tabular-nums}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+.ystep{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--sheet);padding:3px}
+.ystep button{border:0;background:none;width:32px;height:32px;border-radius:50%;font-size:1.05rem;line-height:1}
+.ystep button:hover:not(:disabled){background:var(--navy-soft)}
+.ystep button:disabled{opacity:.3;cursor:default}
+.ystep select{border:0;background:var(--ink);color:var(--sheet);font:inherit;font-weight:700;font-variant-numeric:tabular-nums;border-radius:999px;padding:.3rem .8rem;cursor:pointer;appearance:none;-webkit-appearance:none;text-align:center}
 .btn{border:1px solid var(--line);background:var(--sheet);border-radius:999px;padding:.35rem .9rem;font-weight:500}
 .btn:hover{border-color:var(--muted)}
 
@@ -53,11 +55,10 @@ button:focus-visible,.cell:focus-visible{outline:2px solid var(--navy);outline-o
 
 /* month chips */
 .chips{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-bottom:14px}
-.chips button{border:1px solid transparent;background:none;border-radius:8px;padding:.35rem 0;font-weight:600;font-size:.88rem;color:var(--muted);position:relative}
+.chips button{border:1px solid transparent;background:none;border-radius:8px;padding:.35rem 2px;font-weight:600;font-size:.88rem;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
+.chips .bsm{font-size:.68rem;font-weight:500;color:var(--crimson);line-height:1.2;text-align:center;opacity:.85}
 .chips button:hover{background:var(--sheet);border-color:var(--line)}
 .chips button[aria-current="true"]{background:var(--sheet);border-color:var(--ink);color:var(--ink)}
-.chips button .pip{position:absolute;left:50%;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--crimson);transform:translateX(-50%)}
-.chips button .pip.maj{background:var(--gold);width:6px;height:6px;bottom:2px}
 
 /* main */
 .main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
@@ -161,12 +162,12 @@ button:focus-visible,.cell:focus-visible{outline:2px solid var(--navy);outline-o
   <header class="top">
     <div class="brand">
       <h1>Patro <span class="np">पात्रो</span></h1>
-      <p>English months, Bikram Sambat dates and Nepali holidays · 2026–2027 AD</p>
     </div>
     <div class="controls">
-      <div class="seg" role="group" aria-label="Year">
-        <button id="y2026" data-year="2026">2026</button>
-        <button id="y2027" data-year="2027">2027</button>
+      <div class="ystep">
+        <button id="yPrev" aria-label="Previous year">‹</button>
+        <select id="yearSel" aria-label="Year"></select>
+        <button id="yNext" aria-label="Next year">›</button>
       </div>
       <button class="btn" id="todayBtn">Today</button>
     </div>
@@ -204,9 +205,9 @@ button:focus-visible,.cell:focus-visible{outline:2px solid var(--navy);outline-o
           <div><span class="sw public"></span>Public holiday (incl. Dashain &amp; Tihar)</div>
           <div><span class="sw limited"></span>Holiday for some groups or areas</div>
           <div><span class="sw sat"></span>Saturday &amp; Sunday (weekly holidays)</div>
-          <div><span class="tag est">est.</span>Expected date; 2084 BS list not yet gazetted</div>
+          <div><span class="tag est">est.</span>Expected date; no government list yet</div>
         </div>
-        <p class="note">Dates up to Chaitra 2083 (Apr 13, 2027) follow the government holiday list. Later lunar festivals are calculated and may shift by a day.</p>
+        <p class="note">Holidays up to Chaitra 2083 (Apr 13, 2027) follow the government lists. Later dates come from published patro data, and for mid-2030 from lunar calculation, so they may shift by a day.</p>
       </div>
     </aside>
   </div>
@@ -214,21 +215,18 @@ button:focus-visible,.cell:focus-visible{outline:2px solid var(--navy);outline-o
 
 <script>
 // ---------- Bikram Sambat conversion ----------
-// Month lengths (Baisakh..Chaitra). Anchor: 2082 Baisakh 1 = 2025-04-14.
-const BS_DATA = {
-  2082:[31,31,32,31,31,31,30,29,30,29,30,30],
-  2083:[31,31,32,31,31,31,30,29,30,29,30,30],
-  2084:[31,32,31,32,31,30,30,30,29,29,30,31]
-};
-const ANCHOR = Date.UTC(2025,3,14);
+// Month lengths (Baisakh..Chaitra) per BS year, 2076–2087. Anchor: 2076 Poush 1 = 2019-12-17.
+// Source: Hamro Patro up to 2083 BS, Ashesh Patro from 2084 BS.
+const BS_DATA = {"2076":[0,0,0,0,0,0,0,0,29,29,30,30],"2077":[31,32,31,32,31,30,30,30,29,30,29,31],"2078":[31,31,31,32,31,31,30,29,30,29,30,30],"2079":[31,31,32,31,31,31,30,29,30,29,30,30],"2080":[31,32,31,32,31,30,30,30,29,29,30,30],"2081":[31,32,31,32,31,30,30,30,29,30,29,31],"2082":[31,31,32,31,31,31,30,29,30,29,30,30],"2083":[31,31,32,31,31,31,30,29,30,29,30,30],"2084":[31,32,31,32,31,30,30,30,29,29,30,31],"2085":[30,32,31,32,31,30,30,30,29,30,29,31],"2086":[31,31,32,31,31,31,30,29,30,29,30,30],"2087":[31,31,32,32,31,30,30,29,30,29]};
+const ANCHOR = Date.UTC(2019,11,17), ANCHOR_BS = {y:2076, m:8};
 const BS_MONTHS = ["Baisakh","Jestha","Asar","Shrawan","Bhadra","Ashoj","Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"];
 const BS_MONTHS_NP = ["बैशाख","जेठ","असार","साउन","भदौ","असोज","कार्तिक","मंसिर","पुष","माघ","फागुन","चैत"];
 const NP_DIG = "०१२३४५६७८९";
-const np = n => String(n).replace(/\d/g,d=>NP_DIG[d]);
+const np = n => String(n).replace(/d/g,d=>NP_DIG[d]);
 
 function toBS(y,m,d){ // m 0-based
   let days = Math.round((Date.UTC(y,m,d)-ANCHOR)/864e5);
-  let by = 2082, bm = 0;
+  let by = ANCHOR_BS.y, bm = ANCHOR_BS.m;
   while (true){
     const len = BS_DATA[by][bm];
     if (days < len) return {y:by, m:bm, d:days+1};
@@ -238,110 +236,507 @@ function toBS(y,m,d){ // m 0-based
 }
 
 // ---------- Holidays ----------
-// t: major = Dashain/Tihar, public = national holiday, limited = specific groups/areas, obs = festival (no general holiday)
-// est: lunar date calculated, official 2084 BS list not yet published
+// [AD date, English name, Nepali name, type, note, estimated]
+// type: public = holiday for everyone (incl. Dashain & Tihar), limited = specific groups/areas, obs = festival without a general holiday
+// estimated = 1 when no government list exists yet (from mid-April 2027): dates from published patro data or calculation
 const H = [
-  // 2082 BS (Jan–Apr 2026)
-  ["2026-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public"],
-  ["2026-01-15","Maghe Sankranti","माघे संक्रान्ति","public"],
-  ["2026-01-19","Sonam Lhosar","सोनाम ल्होछार","public"],
-  ["2026-01-23","Basanta Panchami (Saraswati Puja)","वसन्तपञ्चमी","limited","Schools only"],
-  ["2026-01-30","Martyrs' Day","शहीद दिवस","public"],
-  ["2026-02-15","Maha Shivaratri","महाशिवरात्रि","public"],
-  ["2026-02-18","Gyalpo Lhosar","ग्याल्पो ल्होसार","public"],
-  ["2026-02-19","Democracy Day","प्रजातन्त्र दिवस","public"],
-  ["2026-03-02","Fagu Purnima (Holi, hills)","फागु पूर्णिमा","public","Hill & Himalayan districts"],
-  ["2026-03-03","Holi (Terai)","होली","public","Terai districts"],
-  ["2026-03-04","Election holiday","चुनाव बिदा","public"],
-  ["2026-03-05","House of Representatives election","प्रतिनिधिसभा निर्वाचन","public"],
-  ["2026-03-06","Election holiday","चुनाव बिदा","public"],
-  ["2026-03-08","International Women's Day","नारी दिवस","limited","Women only"],
-  ["2026-03-18","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley"],
-  ["2026-03-21","Eid ul-Fitr","ईद उल फितर","public"],
-  ["2026-03-27","Ram Navami","राम नवमी","obs"],
-  // 2083 BS
-  ["2026-04-14","Nepali New Year 2083 · Bisket Jatra","नयाँ वर्ष २०८३","public"],
-  ["2026-05-01","Buddha Jayanti · Labour Day · Ubhauli","बुद्ध जयन्ती","public"],
-  ["2026-05-28","Bakar Eid (Eid al-Adha)","बकर ईद","public"],
-  ["2026-05-29","Republic Day","गणतन्त्र दिवस","public"],
-  ["2026-06-20","Bhoto Jatra","भोटो जात्रा","limited","Kathmandu Valley"],
-  ["2026-08-26","Prophet Muhammad's Birthday","पैगम्बर मोहम्मद जयन्ती","limited","Muslim community"],
-  ["2026-08-28","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public"],
-  ["2026-08-29","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley"],
-  ["2026-09-04","Krishna Janmashtami · Gaura Parva","श्रीकृष्ण जन्माष्टमी","public"],
-  ["2026-09-08","Gen Z Martyrs' Day","जेनजी शहीद दिवस","public"],
-  ["2026-09-14","Haritalika Teej","हरितालिका तीज","limited","Women only"],
-  ["2026-09-19","Constitution Day","संविधान दिवस","public"],
-  ["2026-09-25","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley"],
-  ["2026-10-04","Jitiya Parva","जितिया पर्व","limited","Women only"],
-  ["2026-10-11","Ghatasthapana","घटस्थापना","major","Dashain begins"],
-  ["2026-10-17","Fulpati","फूलपाती","major","Dashain"],
-  ["2026-10-18","Maha Ashtami","महाअष्टमी","major","Dashain"],
-  ["2026-10-19","Dashain holiday","दशैं बिदा","major","Dashain"],
-  ["2026-10-20","Maha Navami","महानवमी","major","Dashain"],
-  ["2026-10-21","Vijaya Dashami (Tika)","विजया दशमी","major","Dashain"],
-  ["2026-10-22","Papankusha Ekadashi","पापांकुशा एकादशी","major","Dashain"],
-  ["2026-10-23","Dashain holiday","दशैं बिदा","major","Dashain"],
-  ["2026-10-26","Kojagrat Purnima","कोजाग्रत पूर्णिमा","obs","End of Dashain"],
-  ["2026-11-07","Kag Tihar","काग तिहार","major","Tihar"],
-  ["2026-11-08","Kukur Tihar · Laxmi Puja","कुकुर तिहार / लक्ष्मी पूजा","major","Tihar"],
-  ["2026-11-09","Gai Puja · Tihar holiday","गाई पूजा","major","Tihar"],
-  ["2026-11-10","Govardhan Puja · Mha Puja · Nepal Sambat 1147","गोवर्धन पूजा / म्ह पूजा","major","Tihar"],
-  ["2026-11-11","Bhai Tika","भाइटीका","major","Tihar"],
-  ["2026-11-12","Tihar holiday","तिहार बिदा","major","Tihar"],
-  ["2026-11-15","Chhath Parva","छठ पर्व","public"],
-  ["2026-11-24","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community"],
-  ["2026-12-03","Int'l Day of Persons with Disabilities","अपाङ्ग दिवस","limited","Persons with disabilities"],
-  ["2026-12-24","Udhauli Parva · Yomari Punhi","उधौली पर्व / योमरी पुन्ही","public"],
-  ["2026-12-25","Christmas","क्रिसमस","public"],
-  ["2026-12-30","Tamu Lhosar","तमु ल्होसार","public"],
-  ["2027-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public"],
-  ["2027-01-15","Maghe Sankranti","माघे संक्रान्ति","public"],
-  ["2027-01-30","Martyrs' Day","शहीद दिवस","public"],
-  ["2027-02-07","Sonam Lhosar","सोनाम ल्होछार","public"],
-  ["2027-02-11","Basanta Panchami (Saraswati Puja)","वसन्तपञ्चमी","limited","Schools only"],
-  ["2027-02-19","Democracy Day","प्रजातन्त्र दिवस","public"],
-  ["2027-03-06","Maha Shivaratri","महाशिवरात्रि","public"],
-  ["2027-03-08","International Women's Day","नारी दिवस","limited","Women only"],
-  ["2027-03-09","Gyalpo Lhosar","ग्याल्पो ल्होसार","public"],
+  ["2020-01-15","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2020-01-25","Sonam Lhosar","सोनाम ल्होसार","public","",0],
+  ["2020-02-21","Maha Shivaratri","महाशिवरात्रि व्रत","public","",0],
+  ["2020-02-24","Gyalpo Lhosar","ग्याल्पो ल्होसार","public","",0],
+  ["2020-03-09","Fagu Purnima (Holi)","फागुपुर्णिमा","public","Hill districts",0],
+  ["2020-03-10","Holi (Terai)","तराई होली","public","Terai districts",0],
+  ["2020-03-24","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley",0],
+  ["2020-04-02","Ram Navami","रामनवमी व्रत","obs","",0],
+  ["2020-04-13","Nepali New Year 2077 · Bisket Jatra","नयाँ वर्ष २०७७ प्रारम्भ / बिस्का जात्रा","public","Bhaktapur",0],
+  ["2020-05-01","Labour Day","अन्तर्राष्ट्रिय श्रमिक दिवस","public","",0],
+  ["2020-05-07","Buddha Jayanti · Ubhauli Parva","बुद्ध जयन्ती / उभौली पर्व","public","",0],
+  ["2020-05-25","Eid ul-Fitr","ईद उल फितर","public","",0],
+  ["2020-08-04","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",0],
+  ["2020-08-21","Haritalika Teej","हरितालिका तीज","limited","Women only",0],
+  ["2020-08-26","Gaura Parva","गौरा पर्व","limited","Sudurpashchim",0],
+  ["2020-09-01","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",0],
+  ["2020-09-10","Jitiya Parva","जितिया पर्व","limited","Women only",0],
+  ["2020-09-19","Constitution Day","संविधान दिवस","public","",0],
+  ["2020-10-17","Ghatasthapana","घटस्थापना व्रत","public","Dashain begins",0],
+  ["2020-10-23","Fulpati","फूलपाती","public","Dashain",0],
+  ["2020-10-24","Maha Ashtami","महाअष्टमी व्रत","public","Dashain",0],
+  ["2020-10-25","Maha Navami","महानवमी व्रत","public","Dashain",0],
+  ["2020-10-26","Vijaya Dashami (Tika)","विजयादशमी","public","Dashain",0],
+  ["2020-10-27","Papankusha Ekadashi","पापांकुशा एकादशी","public","Dashain",0],
+  ["2020-10-30","Kojagrat Purnima","कोजाग्रत पूर्णिमा","obs","End of Dashain",0],
+  ["2020-11-13","Kag Tihar","काग तिहार","obs","Tihar",0],
+  ["2020-11-14","Kukur Tihar · Laxmi Puja","कुकुर तिहार / लक्ष्मी पुजा व्रत","public","Tihar",0],
+  ["2020-11-15","Gai Puja · Mha Puja · Govardhan Puja","गाईगोरु पूजा / म्हपूजा / हलि तिहार","public","Tihar",0],
+  ["2020-11-16","Nepal Sambat 1141 begins · Govardhan Puja · Bhai Tika","नेपाल सम्वत ११४१ प्रारम्भ / गोवर्धन पूजा / भाइटीका","public","Tihar",0],
+  ["2020-11-20","Chhath Parva","छठपर्व व्रत","public","",0],
+  ["2020-12-25","Christmas","क्रिसमस-डे","limited","",0],
+  ["2020-12-30","Udhauli Parva · Yomari Punhi · Tamu Lhosar","उधौली पर्व / तमु ल्होसार","public","",0],
+  ["2021-01-14","Maghe Sankranti · Tol Lhosar","माघे संक्रान्ति / तोल ल्होसार","public","",0],
+  ["2021-02-12","Sonam Lhosar · Gyalpo Lhosar","सोनाम ल्होछार / ग्याल्पो ल्होछार","public","",0],
+  ["2021-02-16","Basanta Panchami (Saraswati Puja)","वसन्तपञ्चमी व्रत","limited","Schools only",0],
+  ["2021-03-08","International Women's Day","नारी दिवस","limited","Women only",0],
+  ["2021-03-11","Maha Shivaratri","महा शिवरात्री","public","",0],
+  ["2021-03-28","Fagu Purnima (Holi)","फागु पुर्णिमा","public","Hill districts",0],
+  ["2021-03-29","Holi (Terai)","फागु पुर्णिमा","public","Terai districts",0],
+  ["2021-04-11","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley",0],
+  ["2021-04-14","Nepali New Year 2078 · Bisket Jatra","नयाँ वर्ष / बिस्का: जात्रा","public","Bhaktapur",0],
+  ["2021-04-21","Ram Navami","श्री राम नवमी व्रत","obs","",0],
+  ["2021-05-01","Labour Day","अन्तर्राष्ट्रिय श्रमिक दिवस","public","",0],
+  ["2021-05-14","Eid ul-Fitr","ईद उल फितर","public","",0],
+  ["2021-05-26","Buddha Jayanti · Ubhauli Parva","बुद्ध जयन्ती / उभौली पर्व","public","",0],
+  ["2021-05-29","Republic Day","गणतन्त्र दिवस","public","",0],
+  ["2021-07-21","Bakar Eid (Eid al-Adha)","ईद उल अधा","public","",0],
+  ["2021-08-22","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public","",0],
+  ["2021-08-23","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",0],
+  ["2021-08-30","Krishna Janmashtami · Gaura Parva","श्रीकृष्ण जन्माष्टमी / गौरा पर्व","public","Sudurpashchim",0],
+  ["2021-09-09","Haritalika Teej","हरितालिका तीज व्रत","limited","Women only",0],
+  ["2021-09-19","Constitution Day · Indra Jatra","संविधान दिवस / इन्द्रजात्रा","public","Kathmandu Valley",0],
+  ["2021-09-29","Jitiya Parva","जितियापर्व","limited","Women only",0],
+  ["2021-10-07","Ghatasthapana","घटस्थापना","public","Dashain begins",0],
+  ["2021-10-12","Fulpati","फूलपाती","public","Dashain",0],
+  ["2021-10-13","Maha Ashtami","महाअष्टमी","public","Dashain",0],
+  ["2021-10-14","Maha Navami","महानवमी","public","Dashain",0],
+  ["2021-10-15","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",0],
+  ["2021-10-16","Papankusha Ekadashi","पापांकुशा एकादशी व्रत","public","Dashain",0],
+  ["2021-10-19","Kojagrat Purnima","कोजाग्रत व्रत","obs","End of Dashain",0],
+  ["2021-10-20","Kojagrat Purnima","कोजाग्रत पूर्णिमा व्रत","obs","End of Dashain",0],
+  ["2021-11-03","Kag Tihar","काग तिहार","obs","Tihar",0],
+  ["2021-11-04","Laxmi Puja","लक्ष्मी पुजा","public","Tihar",0],
+  ["2021-11-05","Nepal Sambat 1142 begins · Govardhan Puja · Mha Puja · Gai Puja","नेपाल सम्वत ११४२ प्रारम्भ / गोवर्धन पूजा / म्हपूजा / गाईगोरु पूजा","public","Tihar",0],
+  ["2021-11-06","Bhai Tika","भाइटीका","public","Tihar",0],
+  ["2021-11-07","Tihar holiday","तिहार बिदा","public","Tihar",0],
+  ["2021-11-10","Chhath Parva","छठपर्व व्रत","public","",0],
+  ["2021-11-11","Falgunanda Jayanti","महागुरु फाल्गुनन्द जयन्ती","limited","Kirat community",0],
+  ["2021-11-19","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",0],
+  ["2021-12-03","Int'l Day of Persons with Disabilities","अन्तर्राष्ट्रिय अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2021-12-19","Udhauli Parva · Yomari Punhi","उधौली पर्व","public","",0],
+  ["2021-12-25","Christmas","क्रिसमस-डे","public","",0],
+  ["2021-12-30","Tamu Lhosar","तमु ल्होसार","public","",0],
+  ["2022-01-15","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2022-01-30","Martyrs' Day","शहीद दिवस","public","",0],
+  ["2022-02-02","Sonam Lhosar","सोनाम ल्होछार","public","",0],
+  ["2022-02-06","Basanta Panchami (Saraswati Puja)","वसन्तपञ्चमी व्रत","limited","Schools only",0],
+  ["2022-02-19","Democracy Day","प्रजातन्त्र दिवस","public","",0],
+  ["2022-03-01","Maha Shivaratri","महा शिवरात्री","public","",0],
+  ["2022-03-03","Gyalpo Lhosar","ग्याल्पो ल्होसार","public","",0],
+  ["2022-03-08","International Women's Day","नारी दिवस","limited","Women only",0],
+  ["2022-03-17","Fagu Purnima (Holi)","फागु पुर्णिमा","public","Hill districts",0],
+  ["2022-03-18","Holi (Terai)","फागु पुर्णिमा","public","Terai districts",0],
+  ["2022-04-01","Ghode Jatra","घोडे जात्रा","limited","Kathmandu Valley",0],
+  ["2022-04-10","Ram Navami","श्री राम नवमी व्रत","obs","",0],
+  ["2022-04-14","Nepali New Year 2079 · Bisket Jatra","नयाँ वर्ष / बिस्का: जात्रा","public","Bhaktapur",0],
+  ["2022-05-01","Labour Day","अन्तर्राष्ट्रिय श्रमिक दिवस","public","",0],
+  ["2022-05-03","Eid ul-Fitr","ईद उल फितर","public","",0],
+  ["2022-05-13","Election holiday","स्थानीय तह निर्वाचन २०७९","public","",0],
+  ["2022-05-16","Buddha Jayanti · Ubhauli Parva","बुद्ध जयन्ती / उभौली पर्व","public","",0],
+  ["2022-05-29","Republic Day","गणतन्त्र दिवस","public","",0],
+  ["2022-06-04","Bhoto Jatra","भोटो जात्रा","limited","Kathmandu Valley",0],
+  ["2022-08-12","Janai Purnima · Raksha Bandhan · Gai Jatra","जनै पूर्णिमा / गाईजात्रा","public","Kathmandu Valley",0],
+  ["2022-08-19","Krishna Janmashtami","श्रीकृष्ण जन्माष्टमी","public","",0],
+  ["2022-08-30","Haritalika Teej","हरितालिका तीज व्रत","limited","Women only",0],
+  ["2022-09-03","Gaura Parva","गौरा पर्व","limited","Sudurpashchim",0],
+  ["2022-09-09","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",0],
+  ["2022-09-18","Jitiya Parva","जितियापर्व","limited","Women only",0],
+  ["2022-09-19","Constitution Day","संविधान दिवस","public","",0],
+  ["2022-09-26","Ghatasthapana","घटस्थापना","public","Dashain begins",0],
+  ["2022-10-02","Fulpati","फूलपाती","public","Dashain",0],
+  ["2022-10-03","Maha Ashtami","महाअष्टमी","public","Dashain",0],
+  ["2022-10-04","Maha Navami","महानवमी","public","Dashain",0],
+  ["2022-10-05","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",0],
+  ["2022-10-06","Papankusha Ekadashi","पापांकुशा एकादशी व्रत","public","Dashain",0],
+  ["2022-10-07","Dashain holiday","दशैं विदा","public","Dashain",0],
+  ["2022-10-09","Kojagrat Purnima","कोजाग्रत व्रत","obs","End of Dashain",0],
+  ["2022-10-23","Kag Tihar","काग तिहार","obs","Tihar",0],
+  ["2022-10-24","Laxmi Puja · Kukur Tihar","लक्ष्मी पुजा / कुकुर तिहार","public","Tihar",0],
+  ["2022-10-25","Gai Puja","गाईगोरु पूजा","public","Tihar",0],
+  ["2022-10-26","Govardhan Puja · Mha Puja · Nepal Sambat 1143 begins","गोवर्धन पूजा / म्हपूजा / नेपाल सम्वत ११४३ प्रारम्भ","public","Tihar",0],
+  ["2022-10-27","Bhai Tika","भाइटीका","public","Tihar",0],
+  ["2022-10-28","Tihar holiday","तिहार विदा","public","Tihar",0],
+  ["2022-10-30","Chhath Parva","छठपर्व व्रत","public","",0],
+  ["2022-11-08","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",0],
+  ["2022-11-20","Election holiday","निर्वाचन विदा","public","",0],
+  ["2022-11-21","Election holiday","निर्वाचन विदा","public","",0],
+  ["2022-12-03","Int'l Day of Persons with Disabilities","अन्तर्राष्ट्रिय अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2022-12-08","Udhauli Parva · Yomari Punhi","उधौली पर्व","public","",0],
+  ["2022-12-24","Tol Lhosar","तोल ल्होसार","limited","",0],
+  ["2022-12-25","Christmas","क्रिसमस-डे","public","",0],
+  ["2022-12-30","Tamu Lhosar","तमु ल्होसार","public","",0],
+  ["2023-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public","",0],
+  ["2023-01-15","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2023-01-22","Sonam Lhosar","सोनाम ल्होछार","public","",0],
+  ["2023-01-26","Basanta Panchami (Saraswati Puja)","वसन्तपञ्चमी व्रत","limited","Schools only",0],
+  ["2023-02-18","Maha Shivaratri","महा शिवरात्री","public","",0],
+  ["2023-02-19","Democracy Day","प्रजातन्त्र दिवस","public","",0],
+  ["2023-02-21","Gyalpo Lhosar","ग्याल्पो ल्होछार","public","",0],
+  ["2023-03-06","Fagu Purnima (Holi)","फागु पुर्णिमा","public","Hill districts",0],
+  ["2023-03-07","Holi (Terai)","फागु पुर्णिमा","public","Terai districts",0],
+  ["2023-03-08","International Women's Day","नारी दिवस","limited","Women only",0],
+  ["2023-03-21","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley",0],
+  ["2023-03-30","Ram Navami","श्री राम नवमी व्रत","obs","",0],
+  ["2023-04-14","Nepali New Year 2080 · Bisket Jatra","नयाँ वर्ष / बिस्का: जात्रा","public","Bhaktapur",0],
+  ["2023-04-22","Eid ul-Fitr","ईद उल फितर","public","",0],
+  ["2023-05-01","Labour Day","अन्तर्राष्ट्रिय  श्रमिक दिवस","public","",0],
+  ["2023-05-05","Buddha Jayanti · Ubhauli Parva","बुद्ध जयन्ती / उभौली पर्व","public","",0],
+  ["2023-05-29","Republic Day","गणतन्त्र दिवस","public","",0],
+  ["2023-06-29","Bakar Eid (Eid al-Adha)","ईद उल अधा","public","",0],
+  ["2023-08-24","Gaura Parva","गौरा पर्व","limited","Sudurpashchim",0],
+  ["2023-08-31","Janai Purnima · Raksha Bandhan · Gai Jatra","जनै पूर्णिमा / गाईजात्रा","public","Kathmandu Valley",0],
+  ["2023-09-01","Gai Jatra","सापारु","limited","Kathmandu Valley",0],
+  ["2023-09-06","Krishna Janmashtami","श्रीकृष्ण जन्माष्टमी","public","",0],
+  ["2023-09-18","Haritalika Teej","हरितालिका तीज व्रत","limited","Women only",0],
+  ["2023-09-20","Constitution Day","संविधान दिवस","public","",0],
+  ["2023-09-28","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",0],
+  ["2023-10-07","Jitiya Parva","जितिया पर्व","limited","Women only",0],
+  ["2023-10-15","Ghatasthapana","घटस्थापना","public","Dashain begins",0],
+  ["2023-10-21","Fulpati","फूलपाती","public","Dashain",0],
+  ["2023-10-22","Maha Ashtami","महाअष्टमी","public","Dashain",0],
+  ["2023-10-23","Maha Navami","महानवमी","public","Dashain",0],
+  ["2023-10-24","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",0],
+  ["2023-10-25","Papankusha Ekadashi","पापांकुशा एकादशी व्रत","public","Dashain",0],
+  ["2023-10-26","Dashain holiday","दशैं बिदा","public","Dashain",0],
+  ["2023-10-28","Kojagrat Purnima","कोजाग्रत पूर्णिमा व्रत","obs","End of Dashain",0],
+  ["2023-11-11","Falgunanda Jayanti · Kag Tihar","महागुरु फाल्गुनन्द जयन्ती / काग तिहार","limited","Kirat community",0],
+  ["2023-11-12","Laxmi Puja · Kukur Tihar","लक्ष्मी पुजा / नरक चतुर्दशी","public","Tihar",0],
+  ["2023-11-13","Gai Puja","गाई तिहार","public","Tihar",0],
+  ["2023-11-14","Govardhan Puja · Mha Puja · Nepal Sambat 1144 begins","गोवर्धन पूजा / म्ह: पूजा / नेपाल सम्वत ११४४ प्रारम्भ","public","Tihar",0],
+  ["2023-11-15","Bhai Tika","भाई टिका","public","Tihar",0],
+  ["2023-11-16","Tihar holiday","तिहार बिदा","public","Tihar",0],
+  ["2023-11-19","Chhath Parva","छठपर्व व्रत","public","",0],
+  ["2023-11-27","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",0],
+  ["2023-12-03","Int'l Day of Persons with Disabilities","अन्तर्राष्ट्रिय अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2023-12-25","Christmas","क्रिसमस-डे","public","",0],
+  ["2023-12-26","Udhauli Parva · Yomari Punhi","उधौली पर्व","public","",0],
+  ["2023-12-31","Tamu Lhosar","तमु ल्होसार","public","",0],
+  ["2024-01-12","Prithvi Jayanti · Tol Lhosar","पृथ्वी जयन्ती / तोल ल्होसार","public","",0],
+  ["2024-01-15","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2024-02-10","Sonam Lhosar","सोनाम ल्होछार","public","",0],
+  ["2024-02-14","Basanta Panchami (Saraswati Puja)","वसन्तपञ्चमी व्रत","limited","Schools only",0],
+  ["2024-02-19","Democracy Day","प्रजातन्त्र दिवस","public","",0],
+  ["2024-03-08","Maha Shivaratri · International Women's Day","महाशिवरात्रि व्रत / नारी दिवस","public","Women only",0],
+  ["2024-03-11","Gyalpo Lhosar","ग्याल्पो ल्होछार","public","",0],
+  ["2024-03-24","Fagu Purnima (Holi)","फागु पुर्णिमा","public","Hill districts",0],
+  ["2024-03-25","Holi (Terai)","फागु पुर्णिमा","public","Terai districts",0],
+  ["2024-04-08","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley",0],
+  ["2024-04-11","Eid ul-Fitr","ईद उल फितर","public","",0],
+  ["2024-04-13","Nepali New Year 2081 · Bisket Jatra","नयाँ वर्ष / बिस्का: जात्रा","public","Bhaktapur",0],
+  ["2024-04-17","Ram Navami","श्री राम नवमी व्रत","public","",0],
+  ["2024-05-01","Labour Day","अन्तर्राष्ट्रिय श्रमिक दिवस","public","",0],
+  ["2024-05-23","Buddha Jayanti · Ubhauli Parva","बुद्ध जयन्ती / उभौली पर्व","public","",0],
+  ["2024-05-28","Republic Day","गणतन्त्र दिवस","public","",0],
+  ["2024-06-17","Bakar Eid (Eid al-Adha)","बक्र ईद","public","",0],
+  ["2024-08-04","Bhoto Jatra","भोटो जात्रा","limited","Kathmandu Valley",0],
+  ["2024-08-19","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public","",0],
+  ["2024-08-20","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",0],
+  ["2024-08-26","Krishna Janmashtami · Gaura Parva","श्रीकृष्ण जन्माष्टमी / गाैरा पर्व","public","Sudurpashchim",0],
+  ["2024-09-06","Haritalika Teej","हरितालिका तीज","limited","Women only",0],
+  ["2024-09-17","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",0],
+  ["2024-09-19","Constitution Day","संविधान दिवस","public","",0],
+  ["2024-09-25","Jitiya Parva","जितियापर्व","limited","Women only",0],
+  ["2024-10-03","Ghatasthapana","घटस्थापना व्रत","public","Dashain begins",0],
+  ["2024-10-10","Fulpati","फूलपाती","public","Dashain",0],
+  ["2024-10-11","Maha Ashtami · Maha Navami","महाअष्टमी व्रत / महानवमी व्रत","public","Dashain",0],
+  ["2024-10-12","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",0],
+  ["2024-10-13","Papankusha Ekadashi","पापांकुशा एकादशी व्रत","public","Dashain",0],
+  ["2024-10-14","Dashain holiday","दशैं विदा","public","Dashain",0],
+  ["2024-10-16","Kojagrat Purnima","कोजाग्रत व्रत","obs","End of Dashain",0],
+  ["2024-10-30","Kag Tihar","काग तिहार","obs","Tihar",0],
+  ["2024-10-31","Laxmi Puja · Kukur Tihar","लक्ष्मी पूजा / कुकुर तिहार","public","Tihar",0],
+  ["2024-11-01","Tihar holiday","तिहार बिदा","public","Tihar",0],
+  ["2024-11-02","Govardhan Puja · Nepal Sambat 1145 begins · Mha Puja · Gai Puja","गोवर्धन पूजा / नेपाल सम्वत ११४५ प्रारम्भ / म्हपूजा / गाईगोरु पूजा","public","Tihar",0],
+  ["2024-11-03","Bhai Tika","भाइटीका","public","Tihar",0],
+  ["2024-11-04","Tihar holiday","तिहार बिदा","public","Tihar",0],
+  ["2024-11-07","Chhath Parva","छठ पर्व","public","",0],
+  ["2024-11-10","Falgunanda Jayanti","महागुरु फाल्गुनन्द जयन्ती","limited","Kirat community",0],
+  ["2024-11-15","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",0],
+  ["2024-11-18","Mourning holiday","शोक बिदा","public","",0],
+  ["2024-12-03","Int'l Day of Persons with Disabilities","अन्तर्राष्ट्रिय अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2024-12-15","Udhauli Parva · Yomari Punhi","उधौली पर्व","public","",0],
+  ["2024-12-25","Christmas","क्रिसमस-डे","public","",0],
+  ["2024-12-30","Tamu Lhosar","तमु ल्होसार","public","",0],
+  ["2025-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public","",0],
+  ["2025-01-14","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2025-01-29","Martyrs' Day","शहीद दिवस","public","",0],
+  ["2025-01-30","Sonam Lhosar","सोनाम ल्होछार","public","",0],
+  ["2025-02-19","Democracy Day","प्रजातन्त्र दिवस","public","",0],
+  ["2025-02-26","Maha Shivaratri","महाशिवरात्रि व्रत","public","",0],
+  ["2025-02-28","Gyalpo Lhosar","ग्याल्पो ल्होछार","public","",0],
+  ["2025-03-08","International Women's Day","अन्तर्राष्ट्रिय नारी दिवस","limited","Women only",0],
+  ["2025-03-13","Fagu Purnima (Holi)","फागु पुर्णिमा","public","Hill districts",0],
+  ["2025-03-14","Holi (Terai)","फागु पुर्णिमा","public","Terai districts",0],
+  ["2025-03-29","Ghode Jatra","घोडे जात्रा","limited","Kathmandu Valley",0],
+  ["2025-03-31","Eid ul-Fitr","ईद उल फितर","public","",0],
+  ["2025-04-06","Ram Navami","रामनवमी व्रत","obs","",0],
+  ["2025-04-14","Nepali New Year 2082 · Bisket Jatra","नयाँ वर्ष / बिस्का: जात्रा","public","Bhaktapur",0],
+  ["2025-05-01","Labour Day","अन्तर्राष्ट्रिय  श्रमिक दिवस","public","",0],
+  ["2025-05-12","Buddha Jayanti · Ubhauli Parva","बुद्ध जयन्ती / उभौली पर्व","public","",0],
+  ["2025-05-29","Republic Day","गणतन्त्र दिवस","public","",0],
+  ["2025-06-01","Bhoto Jatra","भोटो जात्रा","limited","Kathmandu Valley",0],
+  ["2025-06-07","Bakar Eid (Eid al-Adha)","बकर ईद","public","",0],
+  ["2025-08-09","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public","",0],
+  ["2025-08-10","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",0],
+  ["2025-08-16","Krishna Janmashtami","श्रीकृष्ण जन्माष्टमी","public","",0],
+  ["2025-08-26","Haritalika Teej","हरितालिका तीज","limited","Women only",0],
+  ["2025-08-31","Gaura Parva","गाैरा पर्व","limited","Sudurpashchim",0],
+  ["2025-09-06","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",0],
+  ["2025-09-15","Jitiya Parva","जितियापर्व","limited","Women only",0],
+  ["2025-09-17","Gen Z movement (mourning)","जेनजी आन्दोलन","public","",0],
+  ["2025-09-19","Constitution Day","संविधान दिवस","public","",0],
+  ["2025-09-22","Ghatasthapana","घटस्थापना व्रत","public","Dashain begins",0],
+  ["2025-09-29","Fulpati","फूलपाती","public","Dashain",0],
+  ["2025-09-30","Maha Ashtami","महाअष्टमी व्रत","public","Dashain",0],
+  ["2025-10-01","Maha Navami","महानवमी व्रत","public","Dashain",0],
+  ["2025-10-02","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",0],
+  ["2025-10-04","Dashain holiday","दशैं विदा","public","Dashain",0],
+  ["2025-10-06","Kojagrat Purnima","कोजाग्रत व्रत","obs","End of Dashain",0],
+  ["2025-10-19","Kag Tihar","काग तिहार","obs","Tihar",0],
+  ["2025-10-20","Laxmi Puja · Kukur Tihar","लक्ष्मी पूजा / कुकुर तिहार","public","Tihar",0],
+  ["2025-10-21","Tihar holiday","तिहार बिदा","public","Tihar",0],
+  ["2025-10-22","Govardhan Puja · Nepal Sambat 1146 begins · Gai Puja · Mha Puja","गोवर्धन पूजा / नेपाल सम्वत ११४६ प्रारम्भ / गाईगोरु पूजा / म्हपूजा","public","Tihar",0],
+  ["2025-10-23","Bhai Tika","भाइटीका","public","Tihar",0],
+  ["2025-10-24","Tihar holiday","तिहार  बिदा","public","Tihar",0],
+  ["2025-10-27","Chhath Parva","छठ पर्व","public","",0],
+  ["2025-11-05","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",0],
+  ["2025-11-11","Falgunanda Jayanti","महागुरु फाल्गुनन्द जयन्ती","limited","Kirat community",0],
+  ["2025-12-03","Int'l Day of Persons with Disabilities","अन्तर्राष्ट्रिय अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2025-12-04","Udhauli Parva · Yomari Punhi","उँधौली पर्व","public","",0],
+  ["2025-12-20","Tol Lhosar","तोल ल्होसार","limited","",0],
+  ["2025-12-25","Christmas","क्रिसमस-डे","public","",0],
+  ["2025-12-30","Tamu Lhosar","तमु ल्होसार","public","",0],
+  ["2026-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public","",0],
+  ["2026-01-15","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2026-01-19","Sonam Lhosar","सोनाम ल्होछार","public","",0],
+  ["2026-01-23","Basanta Panchami (Saraswati Puja)","वसन्तपञ्चमी व्रत","limited","Schools only",0],
+  ["2026-01-30","Martyrs' Day","शहीद दिवस","public","",0],
+  ["2026-02-15","Maha Shivaratri","महाशिवरात्रि","public","",0],
+  ["2026-02-18","Gyalpo Lhosar","ग्याल्पो ल्होसार","public","",0],
+  ["2026-02-19","Democracy Day","प्रजातन्त्र दिवस","public","",0],
+  ["2026-03-02","Fagu Purnima (Holi)","फागु पुर्णिमा","public","Hill districts",0],
+  ["2026-03-03","Holi (Terai)","फागु पुर्णिमा","public","Terai districts",0],
+  ["2026-03-04","Election holiday","चुनाव बिदा २०८२","public","",0],
+  ["2026-03-05","Election holiday","प्रतिनिधिसभा निर्वाचन २०८२","public","",0],
+  ["2026-03-06","Election holiday","चुनाव बिदा २०८२","public","",0],
+  ["2026-03-08","International Women's Day","नारी दिवस","limited","Women only",0],
+  ["2026-03-18","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley",0],
+  ["2026-03-21","Eid ul-Fitr","ईद उल फितर","public","",0],
+  ["2026-03-27","Ram Navami","श्री राम नवमी व्रत","public","",0],
+  ["2026-04-14","Nepali New Year 2083 · Bisket Jatra","नयाँ वर्ष २०८३ / बिस्का: जात्रा","public","Bhaktapur",0],
+  ["2026-05-01","Buddha Jayanti · Ubhauli Parva · Labour Day","बुद्ध जयन्ती / उभौली पर्व / अन्तर्राष्ट्रिय  श्रमिक दिवस","public","",0],
+  ["2026-05-28","Bakar Eid (Eid al-Adha)","बकर ईद","public","",0],
+  ["2026-05-29","Republic Day","गणतन्त्र दिवस","public","",0],
+  ["2026-06-20","Bhoto Jatra","भोटो जात्रा","limited","Kathmandu Valley",0],
+  ["2026-08-26","Prophet Muhammad's Birthday","पैगम्बर मोहम्मद जयन्ती","limited","Muslim community",0],
+  ["2026-08-28","Janai Purnima · Raksha Bandhan","रक्षा बन्धन","public","",0],
+  ["2026-08-29","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",0],
+  ["2026-09-04","Krishna Janmashtami · Gaura Parva","श्रीकृष्ण जन्माष्टमी / गाैरा पर्व","public","Sudurpashchim",0],
+  ["2026-09-08","Gen Z Martyrs' Day","जेनजी शहीद दिवस","public","",0],
+  ["2026-09-14","Haritalika Teej","हरितालिका तीज","limited","Women only",0],
+  ["2026-09-19","Constitution Day","संविधान दिवस","public","",0],
+  ["2026-09-25","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",0],
+  ["2026-10-04","Jitiya Parva","जितियापर्व","limited","Women only",0],
+  ["2026-10-11","Ghatasthapana","घटस्थापना व्रत","public","Dashain begins",0],
+  ["2026-10-17","Fulpati · Dashain holiday","फूलपाती / दशैं बिदा","public","Dashain",0],
+  ["2026-10-18","Maha Ashtami","महाअष्टमी व्रत","public","Dashain",0],
+  ["2026-10-19","Dashain holiday","दशैं बिदा","public","Dashain",0],
+  ["2026-10-20","Maha Navami","महानवमी व्रत","public","Dashain",0],
+  ["2026-10-21","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",0],
+  ["2026-10-22","Papankusha Ekadashi","पापांकुशा एकादशी व्रत","public","Dashain",0],
+  ["2026-10-23","Dashain holiday","दशैं बिदा","public","Dashain",0],
+  ["2026-10-25","Kojagrat Purnima","कोजाग्रत व्रत","obs","End of Dashain",0],
+  ["2026-11-07","Kag Tihar","काग तिहार","obs","Tihar",0],
+  ["2026-11-08","Laxmi Puja · Kukur Tihar","लक्ष्मी पूजा / कुकुर तिहार","public","Tihar",0],
+  ["2026-11-09","Tihar holiday · Gai Puja","तिहार बिदा / गाई पूजा","public","Tihar",0],
+  ["2026-11-10","Nepal Sambat 1147 begins · Govardhan Puja · Mha Puja","नेपाल सम्वत ११४७ प्रारम्भ / गोवर्धन पूजा / म्हपूजा","public","Tihar",0],
+  ["2026-11-11","Bhai Tika · Falgunanda Jayanti","भाइटीका / महागुरु फाल्गुनन्द जयन्ती","public","Tihar",0],
+  ["2026-11-12","Tihar holiday","तिहार बिदा","public","Tihar",0],
+  ["2026-11-15","Chhath Parva","छठ पर्व","public","",0],
+  ["2026-11-24","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",0],
+  ["2026-12-03","Int'l Day of Persons with Disabilities","अन्तर्राष्ट्रिय अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2026-12-24","Udhauli Parva · Yomari Punhi","उधौली पर्व","public","",0],
+  ["2026-12-25","Christmas","क्रिसमस-डे","public","",0],
+  ["2026-12-30","Tamu Lhosar","तमु ल्होसार","public","",0],
+  ["2027-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public","",0],
+  ["2027-01-15","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2027-01-30","Martyrs' Day","शहीद दिवस","public","",0],
+  ["2027-02-07","Sonam Lhosar","सोनाम ल्होछार","public","",0],
+  ["2027-02-11","Basanta Panchami (Saraswati Puja)","सरस्वती पूजा","limited","Schools only",0],
+  ["2027-02-19","Democracy Day","प्रजातन्त्र दिवस","public","",0],
+  ["2027-03-06","Maha Shivaratri","महाशिवरात्रि","public","",0],
+  ["2027-03-08","International Women's Day","अन्तर्राष्ट्रिय नारी दिवस","limited","Women only",0],
+  ["2027-03-09","Gyalpo Lhosar","ग्याल्पो ल्होसार","public","",0],
   ["2027-03-10","Eid ul-Fitr","ईद उल फितर","public","",1],
-  ["2027-03-21","Fagu Purnima (Holi, hills)","फागु पूर्णिमा","public","Hill & Himalayan districts"],
-  ["2027-03-22","Holi (Terai)","होली","public","Terai districts"],
-  ["2027-04-06","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley"],
-  // 2084 BS (Apr–Dec 2027) — fixed solar dates exact, lunar dates estimated
-  ["2027-04-14","Nepali New Year 2084 · Bisket Jatra","नयाँ वर्ष २०८४","public"],
-  ["2027-04-15","Ram Navami","राम नवमी","obs","",1],
-  ["2027-05-01","Labour Day","श्रमिक दिवस","public"],
+  ["2027-03-21","Fagu Purnima (Holi)","फागु पुर्णिमा","public","Hill districts",0],
+  ["2027-03-22","Holi (Terai)","फागु पुर्णिमा","public","Terai districts",0],
+  ["2027-04-06","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley",0],
+  ["2027-04-14","Nepali New Year 2084","नयाँ वर्ष","public","",0],
+  ["2027-04-15","Ram Navami","रामनवमी","obs","",1],
+  ["2027-05-01","Labour Day","श्रमिक दिवस","public","",0],
   ["2027-05-17","Bakar Eid (Eid al-Adha)","बकर ईद","public","",1],
-  ["2027-05-20","Buddha Jayanti · Ubhauli","बुद्ध जयन्ती","public","",1],
-  ["2027-05-29","Republic Day","गणतन्त्र दिवस","public"],
+  ["2027-05-20","Buddha Jayanti","बुद्ध जयन्ती","public","",1],
+  ["2027-05-29","Republic Day","गणतन्त्र दिवस","public","",0],
   ["2027-08-15","Prophet Muhammad's Birthday","पैगम्बर मोहम्मद जयन्ती","limited","Muslim community",1],
   ["2027-08-17","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public","",1],
   ["2027-08-18","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",1],
   ["2027-08-25","Krishna Janmashtami","श्रीकृष्ण जन्माष्टमी","public","",1],
-  ["2027-09-03","Haritalika Teej","हरितालिका तीज","limited","Women only",1],
-  ["2027-09-09","Gen Z Martyrs' Day","जेनजी शहीद दिवस","public"],
+  ["2027-09-03","Haritalika Teej","हरितालिका","limited","Women only",1],
+  ["2027-09-09","Gen Z Martyrs' Day","जेनजी शहीद दिवस","public","",0],
   ["2027-09-14","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",1],
-  ["2027-09-20","Constitution Day","संविधान दिवस","public"],
-  ["2027-09-30","Ghatasthapana","घटस्थापना","major","Dashain begins",1],
-  ["2027-10-06","Fulpati","फूलपाती","major","Dashain",1],
-  ["2027-10-07","Maha Ashtami","महाअष्टमी","major","Dashain",1],
-  ["2027-10-08","Maha Navami","महानवमी","major","Dashain",1],
-  ["2027-10-09","Vijaya Dashami (Tika)","विजया दशमी","major","Dashain",1],
-  ["2027-10-10","Ekadashi · Dashain holiday","एकादशी","major","Dashain",1],
+  ["2027-09-20","Constitution Day","संविधान दिवस","public","",0],
+  ["2027-09-23","Jitiya Parva","जितिया पर्व","limited","Women only",1],
+  ["2027-09-30","Ghatasthapana","घटस्थापना","public","Dashain begins",1],
+  ["2027-10-06","Fulpati","फूलपाती","public","Dashain",1],
+  ["2027-10-07","Maha Ashtami","महाष्टमी","public","Dashain",1],
+  ["2027-10-09","Maha Navami","महानवमी","public","Dashain",1],
+  ["2027-10-10","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",1],
+  ["2027-10-11","Papankusha Ekadashi","पापांकुश एकादशी","public","Dashain",1],
   ["2027-10-15","Kojagrat Purnima","कोजाग्रत पूर्णिमा","obs","End of Dashain",1],
-  ["2027-10-27","Kag Tihar","काग तिहार","major","Tihar",1],
-  ["2027-10-28","Kukur Tihar","कुकुर तिहार","major","Tihar",1],
-  ["2027-10-29","Laxmi Puja · Gai Puja","लक्ष्मी पूजा","major","Tihar",1],
-  ["2027-10-30","Govardhan Puja · Mha Puja · Nepal Sambat 1148","गोवर्धन पूजा / म्ह पूजा","major","Tihar",1],
-  ["2027-10-31","Bhai Tika","भाइटीका","major","Tihar",1],
-  ["2027-11-04","Chhath Parva","छठ पर्व","public","",1],
+  ["2027-10-27","Kag Tihar","काग तिहार","obs","Tihar",1],
+  ["2027-10-28","Kukur Tihar","कुकुर तिहार","public","Tihar",1],
+  ["2027-10-29","Laxmi Puja","लक्ष्मी पूजा","public","Tihar",1],
+  ["2027-10-30","Mha Puja","म्हः पूजा","public","Tihar",1],
+  ["2027-10-31","Bhai Tika","भाइटीका","public","Tihar",1],
+  ["2027-11-04","Chhath Parva","छठपर्व","public","",1],
   ["2027-11-14","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",1],
-  ["2027-12-03","Int'l Day of Persons with Disabilities","अपाङ्ग दिवस","limited","Persons with disabilities"],
-  ["2027-12-13","Udhauli Parva · Yomari Punhi","उधौली पर्व / योमरी पुन्ही","public","",1],
-  ["2027-12-25","Christmas","क्रिसमस","public"],
-  ["2027-12-31","Tamu Lhosar","तमु ल्होसार","public"],
-].map(([d,n,npn,t,note,est])=>({d,n,np:npn,t:t==="major"?"public":t,note:note||"",est:!!est}));
+  ["2027-12-03","Int'l Day of Persons with Disabilities","अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2027-12-13","Udhauli Parva · Yomari Punhi","योमरी पुन्ही","public","",1],
+  ["2027-12-25","Christmas","क्रिसमस","public","",0],
+  ["2027-12-28","Tol Lhosar","तोल ल्होसार","limited","",1],
+  ["2027-12-31","Tamu Lhosar","तमु ल्होसार","public","",0],
+  ["2028-01-12","Prithvi Jayanti","पृथ्वी जयन्ती","public","",0],
+  ["2028-01-15","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2028-01-27","Sonam Lhosar","सोनाम ल्होसार","public","",1],
+  ["2028-01-30","Martyrs' Day","शहीद दिवस","public","",0],
+  ["2028-02-01","Basanta Panchami (Saraswati Puja)","सरस्वती पूजा","limited","Schools only",1],
+  ["2028-02-19","Democracy Day","प्रजातन्त्र दिवस","public","",0],
+  ["2028-02-23","Maha Shivaratri","महाशिवरात्रि","public","",1],
+  ["2028-02-26","Gyalpo Lhosar","ग्याल्पो ल्होसार","public","",1],
+  ["2028-02-27","Eid ul-Fitr","ईद उल फितर","public","",1],
+  ["2028-03-08","International Women's Day","नारी दिवस","limited","Women only",0],
+  ["2028-03-10","Fagu Purnima (Holi)","पहाडमा होली","public","Hill districts",1],
+  ["2028-03-11","Holi (Terai)","तराईमा होली","public","Terai districts",1],
+  ["2028-03-26","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley",1],
+  ["2028-04-04","Ram Navami","रामनवमी","obs","",1],
+  ["2028-04-14","Nepali New Year 2085","नयाँ वर्ष","public","",0],
+  ["2028-05-01","Labour Day","श्रमिक दिवस","public","",0],
+  ["2028-05-06","Bakar Eid (Eid al-Adha)","बकर ईद","public","",1],
+  ["2028-05-08","Buddha Jayanti","बुद्ध जयन्ती","public","",1],
+  ["2028-05-28","Republic Day","गणतन्त्र दिवस","public","",0],
+  ["2028-08-04","Prophet Muhammad's Birthday","पैगम्बर मोहम्मद जयन्ती","limited","Muslim community",1],
+  ["2028-08-05","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public","",1],
+  ["2028-08-06","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",1],
+  ["2028-08-13","Krishna Janmashtami","श्रीकृष्ण जन्माष्टमी","public","",1],
+  ["2028-08-22","Haritalika Teej","हरितालिका तीज","limited","Women only",1],
+  ["2028-09-02","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",1],
+  ["2028-09-08","Gen Z Martyrs' Day","जेनजी शहीद दिवस","public","",0],
+  ["2028-09-12","Jitiya Parva","जितिया पर्व","limited","Women only",1],
+  ["2028-09-19","Ghatasthapana · Constitution Day","घटस्थापना / संविधान दिवस","public","Dashain begins",1],
+  ["2028-09-25","Fulpati","फूलपाती","public","Dashain",1],
+  ["2028-09-26","Maha Ashtami","महाष्टमी","public","Dashain",1],
+  ["2028-09-27","Maha Navami","महानवमी","public","Dashain",1],
+  ["2028-09-28","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",1],
+  ["2028-09-29","Papankusha Ekadashi","पापांकुश एकादशी","public","Dashain",1],
+  ["2028-10-03","Kojagrat Purnima","कोजाग्रत पूर्णिमा","obs","End of Dashain",1],
+  ["2028-10-16","Kag Tihar","काग तिहार","obs","Tihar",1],
+  ["2028-10-17","Kukur Tihar · Laxmi Puja","कुकुर तिहार / लक्ष्मी पूजा","public","Tihar",1],
+  ["2028-10-18","Mha Puja","म्हः पूजा","public","Tihar",1],
+  ["2028-10-19","Bhai Tika","भाइटीका","public","Tihar",1],
+  ["2028-10-23","Chhath Parva","छठपर्व","public","",1],
+  ["2028-11-02","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",1],
+  ["2028-12-02","Udhauli Parva · Yomari Punhi","योमरी पुन्ही","public","",1],
+  ["2028-12-03","Int'l Day of Persons with Disabilities","अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2028-12-17","Tol Lhosar","तोल ल्होसार","limited","",1],
+  ["2028-12-25","Christmas","क्रिसमस","public","",0],
+  ["2028-12-30","Tamu Lhosar","तमु ल्होसार","public","",0],
+  ["2029-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public","",0],
+  ["2029-01-14","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2029-01-15","Sonam Lhosar","सोनाम ल्होसार","public","",1],
+  ["2029-01-19","Basanta Panchami (Saraswati Puja)","सरस्वती पूजा","limited","Schools only",1],
+  ["2029-01-29","Martyrs' Day","शहीद दिवस","public","",0],
+  ["2029-02-11","Maha Shivaratri","महाशिवरात्रि","public","",1],
+  ["2029-02-14","Gyalpo Lhosar","ग्याल्पो ल्होसार","public","",1],
+  ["2029-02-15","Eid ul-Fitr","ईद उल फितर","public","",1],
+  ["2029-02-19","Democracy Day","प्रजातन्त्र दिवस","public","",0],
+  ["2029-02-27","Fagu Purnima (Holi)","पहाडमा होली","public","Hill districts",1],
+  ["2029-02-28","Holi (Terai)","तराईमा होली","public","Terai districts",1],
+  ["2029-03-08","International Women's Day","नारी दिवस","limited","Women only",0],
+  ["2029-03-15","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley",1],
+  ["2029-04-14","Nepali New Year 2086","नयाँ वर्ष","public","",0],
+  ["2029-04-23","Ram Navami","रामनवमी","obs","",1],
+  ["2029-04-25","Bakar Eid (Eid al-Adha)","बकर ईद","public","",1],
+  ["2029-05-01","Labour Day","श्रमिक दिवस","public","",0],
+  ["2029-05-27","Buddha Jayanti","बुद्ध जयन्ती","public","",1],
+  ["2029-05-29","Republic Day","गणतन्त्र दिवस","public","",0],
+  ["2029-07-24","Prophet Muhammad's Birthday","पैगम्बर मोहम्मद जयन्ती","limited","Muslim community",1],
+  ["2029-08-24","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public","",1],
+  ["2029-08-25","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",1],
+  ["2029-09-01","Krishna Janmashtami","श्रीकृष्ण जन्माष्टमी","public","",1],
+  ["2029-09-08","Gen Z Martyrs' Day","जेनजी शहीद दिवस","public","",0],
+  ["2029-09-11","Haritalika Teej","हरितालिका","limited","Women only",1],
+  ["2029-09-19","Constitution Day","संविधान दिवस","public","",0],
+  ["2029-09-21","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",1],
+  ["2029-10-01","Jitiya Parva","जितिया पर्व","limited","Women only",1],
+  ["2029-10-08","Ghatasthapana","घटस्थापना","public","Dashain begins",1],
+  ["2029-10-13","Fulpati","फूलपाती","public","Dashain",1],
+  ["2029-10-14","Maha Ashtami","महाष्टमी","public","Dashain",1],
+  ["2029-10-15","Maha Navami","महानवमी","public","Dashain",1],
+  ["2029-10-16","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",1],
+  ["2029-10-17","Papankusha Ekadashi","पापांकुश एकादशी","public","Dashain",1],
+  ["2029-10-22","Kojagrat Purnima","कोजाग्रत पूर्णिमा","obs","End of Dashain",1],
+  ["2029-11-04","Kag Tihar","काग तिहार","obs","Tihar",1],
+  ["2029-11-05","Kukur Tihar","कुकुर तिहार","public","Tihar",1],
+  ["2029-11-06","Laxmi Puja","लक्ष्मी पूजा","public","Tihar",1],
+  ["2029-11-07","Mha Puja","म्हः पूजा","public","Tihar",1],
+  ["2029-11-08","Bhai Tika","भाइटीका","public","Tihar",1],
+  ["2029-11-11","Chhath Parva","छठपर्व","public","",1],
+  ["2029-11-21","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",1],
+  ["2029-12-03","Int'l Day of Persons with Disabilities","अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2029-12-20","Udhauli Parva · Yomari Punhi","योमरी पुन्ही","public","",1],
+  ["2029-12-25","Christmas","क्रिसमस","public","",0],
+  ["2029-12-30","Tamu Lhosar","तमु ल्होसार","public","",0],
+  ["2030-01-11","Prithvi Jayanti","पृथ्वी जयन्ती","public","",0],
+  ["2030-01-15","Maghe Sankranti","माघे संक्रान्ति","public","",0],
+  ["2030-01-30","Martyrs' Day","शहीद दिवस","public","",0],
+  ["2030-02-03","Sonam Lhosar","सोनाम ल्होसार","public","",1],
+  ["2030-02-05","Eid ul-Fitr","ईद उल फितर","public","",1],
+  ["2030-02-07","Basanta Panchami (Saraswati Puja)","सरस्वती पूजा","limited","Schools only",1],
+  ["2030-02-19","Democracy Day","प्रजातन्त्र दिवस","public","",0],
+  ["2030-03-02","Maha Shivaratri","महाशिवरात्रि","public","",1],
+  ["2030-03-05","Gyalpo Lhosar","ग्याल्पो ल्होसार","public","",1],
+  ["2030-03-08","International Women's Day","नारी दिवस","limited","Women only",0],
+  ["2030-03-18","Fagu Purnima (Holi)","पहाडमा होली","public","Hill districts",1],
+  ["2030-03-19","Holi (Terai)","तराईमा होली","public","Terai districts",1],
+  ["2030-04-02","Ghode Jatra","घोडेजात्रा","limited","Kathmandu Valley",1],
+  ["2030-04-12","Ram Navami","रामनवमी","obs","",1],
+  ["2030-04-14","Nepali New Year 2087 · Bakar Eid (Eid al-Adha)","नयाँ वर्ष / बकर ईद","public","",1],
+  ["2030-05-01","Labour Day","श्रमिक दिवस","public","",0],
+  ["2030-05-17","Buddha Jayanti","बुद्ध जयन्ती","public","",1],
+  ["2030-05-29","Republic Day","गणतन्त्र दिवस","public","",0],
+  ["2030-07-14","Prophet Muhammad's Birthday","पैगम्बर मोहम्मद जयन्ती","limited","Muslim community",1],
+  ["2030-08-13","Janai Purnima · Raksha Bandhan","जनै पूर्णिमा","public","",1],
+  ["2030-08-14","Gai Jatra","गाईजात्रा","limited","Kathmandu Valley",1],
+  ["2030-08-21","Krishna Janmashtami","श्रीकृष्ण जन्माष्टमी","public","",1],
+  ["2030-08-31","Haritalika Teej","हरितालिका तीज","limited","Women only",1],
+  ["2030-09-09","Gen Z Martyrs' Day","जेनजी शहीद दिवस","public","",0],
+  ["2030-09-10","Indra Jatra","इन्द्रजात्रा","limited","Kathmandu Valley",1],
+  ["2030-09-20","Jitiya Parva · Constitution Day","जितिया पर्व / संविधान दिवस","public","Women only",1],
+  ["2030-09-28","Ghatasthapana","घटस्थापना","public","Dashain begins",1],
+  ["2030-10-03","Fulpati","फूलपाती","public","Dashain",1],
+  ["2030-10-04","Maha Ashtami","महाअष्टमी","public","Dashain",1],
+  ["2030-10-05","Maha Navami","महानवमी","public","Dashain",1],
+  ["2030-10-06","Vijaya Dashami (Tika)","विजया दशमी","public","Dashain",1],
+  ["2030-10-07","Papankusha Ekadashi","पापांकुशा एकादशी","public","Dashain",1],
+  ["2030-10-11","Kojagrat Purnima","कोजाग्रत पूर्णिमा","obs","End of Dashain",1],
+  ["2030-10-25","Kag Tihar","काग तिहार","obs","Tihar",1],
+  ["2030-10-26","Kukur Tihar · Laxmi Puja","कुकुर तिहार / लक्ष्मी पूजा","public","Tihar",1],
+  ["2030-10-27","Mha Puja · Govardhan Puja","म्ह पूजा / गोवर्धन पूजा","public","Tihar",1],
+  ["2030-10-28","Bhai Tika","भाइटीका","public","Tihar",1],
+  ["2030-11-01","Chhath Parva","छठ पर्व","public","",1],
+  ["2030-11-10","Guru Nanak Jayanti","गुरु नानक जयन्ती","limited","Sikh community",1],
+  ["2030-12-03","Int'l Day of Persons with Disabilities","अपाङ्ग दिवस","limited","Persons with disabilities",0],
+  ["2030-12-09","Udhauli Parva · Yomari Punhi","उधौली पर्व / योमरी पुन्ही","public","",1],
+  ["2030-12-25","Christmas","क्रिसमस","public","",0],
+  ["2030-12-30","Tamu Lhosar","तमु ल्होसार","public","",0]
+].map(([d,n,npn,t,note,est])=>({d,n,np:npn,t,note:note||"",est:!!est}));
 const RANK = {major:0, public:1, limited:2, obs:3};
 const byDate = {};
 H.forEach(h=>{(byDate[h.d] ||= []).push(h)});
@@ -356,10 +751,11 @@ const $ = id=>document.getElementById(id);
 
 const now = new Date();
 const TODAY = key(now.getFullYear(), now.getMonth(), now.getDate());
-const inRange = now.getFullYear()>=2026 && now.getFullYear()<=2027;
+const Y0 = 2020, Y1 = 2030;
+const inRange = now.getFullYear()>=Y0 && now.getFullYear()<=Y1;
 
-let state = {y: inRange?now.getFullYear():2026, m: inRange?now.getMonth():0, sel: inRange?TODAY:"2026-01-01"};
-try{ const s=JSON.parse(localStorage.getItem("patro-view")); if(s && s.y>=2026 && s.y<=2027 && !inRange) state={...state,...s}; }catch(e){}
+let state = {y: inRange?now.getFullYear():Y0, m: inRange?now.getMonth():0, sel: inRange?TODAY:Y0+"-01-01"};
+try{ const s=JSON.parse(localStorage.getItem("patro-view")); if(s && s.y>=Y0 && s.y<=Y1 && !inRange) state={...state,...s}; }catch(e){}
 
 $("dow").innerHTML = DOW.map(([e,n])=>`<div><span>${e}</span><span class="n">${n}</span></div>`).join("");
 
@@ -368,17 +764,16 @@ function bsLabel(b){ return `${BS_MONTHS_NP[b.m]} ${np(b.d)}, ${np(b.y)}`; }
 function render(){
   const {y,m} = state;
   try{ localStorage.setItem("patro-view", JSON.stringify({y,m})); }catch(e){}
-  $("y2026").setAttribute("aria-pressed", y===2026);
-  $("y2027").setAttribute("aria-pressed", y===2027);
-  $("prev").disabled = (y===2026 && m===0);
-  $("nextM").disabled = (y===2027 && m===11);
+  $("yearSel").value = y;
+  $("yPrev").disabled = y===Y0;
+  $("yNext").disabled = y===Y1;
+  $("prev").disabled = (y===Y0 && m===0);
+  $("nextM").disabled = (y===Y1 && m===11);
 
   // chips
   $("chips").innerHTML = MON.map((mn,i)=>{
-    const ks = Object.keys(byDate).filter(k=>k.startsWith(`${y}-${String(i+1).padStart(2,"0")}`));
-    const maj = ks.some(k=>byDate[k].some(h=>h.t==="major"));
-    const pub = ks.some(k=>byDate[k].some(h=>h.t==="public"));
-    return `<button data-m="${i}" ${i===m?'aria-current="true"':''}>${mn}${maj?'<span class="pip maj"></span>':pub?'<span class="pip"></span>':''}</button>`;
+    const a = toBS(y,i,1), b = toBS(y,i,new Date(y,i+1,0).getDate());
+    return `<button data-m="${i}" ${i===m?'aria-current="true"':''}><span>${mn}</span><span class="bsm">${BS_MONTHS_NP[a.m]}–${BS_MONTHS_NP[b.m]}</span></button>`;
   }).join("");
 
   // title + BS span
@@ -460,10 +855,13 @@ function renderNext(){
 function go(k){ const [y,m]=k.split("-").map(Number); state={y,m:m-1,sel:k}; render(); }
 
 $("chips").addEventListener("click",e=>{const b=e.target.closest("button"); if(b){state.m=+b.dataset.m; render();}});
-document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{state.y=+b.dataset.year; render();}));
+for(let y=Y0;y<=Y1;y++) $("yearSel").add(new Option(y,y));
+$("yearSel").addEventListener("change",e=>{state.y=+e.target.value; render();});
+$("yPrev").onclick=()=>{ if(state.y>Y0){state.y--; render();} };
+$("yNext").onclick=()=>{ if(state.y<Y1){state.y++; render();} };
 $("prev").onclick=()=>{ if(state.m===0){state.y--;state.m=11}else state.m--; render(); };
 $("nextM").onclick=()=>{ if(state.m===11){state.y++;state.m=0}else state.m++; render(); };
-$("todayBtn").onclick=()=>{ inRange ? go(TODAY) : go("2026-01-01"); };
+$("todayBtn").onclick=()=>{ inRange ? go(TODAY) : go(Y0+"-01-01"); };
 $("grid").addEventListener("click",e=>{const c=e.target.closest(".cell[data-k]"); if(c){state.sel=c.dataset.k; render();}});
 $("list").addEventListener("click",e=>{const li=e.target.closest("li[data-k]"); if(li){state.sel=li.dataset.k; render();}});
 document.addEventListener("keydown",e=>{
