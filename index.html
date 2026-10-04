@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="English calendar for 2020-2030 with Nepali BS dates and holidays">
+<meta name="description" content="English calendar for 2020-2030 with Nepali BS dates, holidays and a date converter">
 <title>Patro 2020–2030</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&display=swap">
@@ -154,6 +155,83 @@ button:focus-visible,.cell:focus-visible{outline:2px solid var(--navy);outline-o
   .sheet-head h2{font-size:1.4rem}
 }
 @media (prefers-reduced-motion:no-preference){.cell,.chips button{transition:background-color .15s}}
+
+/* view tabs */
+.top{align-items:center}
+.tabs{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:999px;background:var(--sheet);padding:3px}
+.tabs button{border:0;background:none;padding:.35rem 1rem;border-radius:999px;font-weight:600;color:var(--muted)}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-current="true"]{background:var(--crimson);color:#fff}
+@media (max-width:620px){ .top{justify-content:flex-start} .tabs{order:3;width:100%} .tabs button{flex:1;padding:.35rem .4rem} }
+
+/* year view */
+.yhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 24px;margin-bottom:10px}
+.yhead h2{font-family:var(--display);font-weight:400;font-size:2.1rem;line-height:1;margin:0}
+.yhead h2 span{display:block;font-family:var(--body);font-size:.95rem;font-weight:600;color:var(--crimson);margin-top:4px}
+.ystats{display:flex;flex-wrap:wrap;gap:8px}
+.ystats div{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:.4rem .75rem;display:flex;align-items:baseline;gap:6px;font-size:.85rem;color:var(--muted)}
+.ystats b{font-size:1.15rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.ykey{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.8rem;color:var(--muted);margin-bottom:12px}
+.ykey span{display:inline-flex;align-items:center;gap:6px}
+.ykey .sw{display:inline-block;width:12px;height:12px}
+.yeargrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mini{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:10px 10px 8px;min-width:0}
+.mini-h{display:flex;justify-content:space-between;align-items:baseline;width:100%;border:0;background:none;padding:0 2px 6px;text-align:left;gap:6px}
+.mini-h span{font-family:var(--display);font-size:1.1rem}
+.mini-h small{font-size:.7rem;color:var(--crimson);font-weight:600;white-space:nowrap}
+.mini-h:hover span{text-decoration:underline}
+.mini-dow,.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mini-dow span{font-size:.62rem;text-align:center;color:var(--muted);font-weight:700}
+.mini-dow span:first-child,.mini-dow span:last-child{color:var(--crimson)}
+.md{border:0;background:none;border-radius:6px;padding:3px 0 2px;font-size:.8rem;font-weight:600;line-height:1.05;font-variant-numeric:tabular-nums;display:flex;flex-direction:column;align-items:center}
+.md small{font-size:.55rem;font-weight:500;color:var(--muted)}
+.md:hover{background:var(--navy-soft)}
+.md.we{color:var(--crimson)}
+.md.public{background:var(--crimson);color:#fff}
+.md.public small{color:#fff;opacity:.85}
+.md.limited{background:var(--navy-soft);color:var(--navy)}
+.md.obs{text-decoration:underline dotted;text-underline-offset:2px}
+.md.today{box-shadow:inset 0 0 0 2px var(--today)}
+.ybottom{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:14px;margin-top:14px;align-items:start}
+.breaks{list-style:none;margin:0;padding:0}
+.breaks li{display:grid;grid-template-columns:4.2rem 1fr;gap:0 10px;padding:7px 0;border-top:1px solid var(--line);cursor:pointer;font-size:.88rem}
+.breaks li:first-child{border-top:0}
+.breaks li b{grid-row:span 2;color:var(--crimson);font-variant-numeric:tabular-nums}
+.breaks .rg{font-weight:600}
+.breaks .why{color:var(--muted);font-size:.8rem}
+.breaks li:hover .rg{text-decoration:underline}
+.ylist{columns:3 200px;column-gap:20px}
+.ym{break-inside:avoid;margin-bottom:10px}
+.ym h4{margin:0 0 3px;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ym ul{list-style:none;margin:0;padding:0}
+.ym li{display:grid;grid-template-columns:1.6rem 1fr;gap:6px;font-size:.84rem;line-height:1.3;padding:2px 0;cursor:pointer}
+.ym li .d{font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--crimson)}
+.ym li.limited .d{color:var(--navy)}
+.ym li:hover span:last-child{text-decoration:underline}
+@media (max-width:1000px){ .yeargrid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:760px){ .yeargrid{grid-template-columns:repeat(2,minmax(0,1fr))} .ybottom{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:420px){ .yeargrid{grid-template-columns:minmax(0,1fr)} }
+
+/* converter */
+.conv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.cbox{padding:16px 18px}
+.cbox h3{font-size:.8rem}
+.ctitle{margin:-4px 0 12px;font-family:var(--display);font-size:1.35rem;line-height:1.15}
+.pick{display:grid;grid-template-columns:1.2fr 1.5fr .9fr;gap:8px}
+.pick label{display:flex;flex-direction:column;gap:4px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);min-width:0}
+.pick select{font:inherit;font-size:.95rem;letter-spacing:0;text-transform:none;font-weight:600;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:.45rem .5rem;min-width:0;width:100%}
+.pick select:focus-visible{outline:2px solid var(--navy);outline-offset:1px}
+.res{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.res-row{display:grid;grid-template-columns:2.4rem 1fr;gap:10px;align-items:baseline}
+.res-lab{font-size:.7rem;font-weight:700;letter-spacing:.08em;color:var(--muted);background:var(--paper);border:1px solid var(--line);border-radius:5px;text-align:center;padding:1px 0}
+.res-big{font-family:var(--display);font-size:1.3rem;line-height:1.2}
+.res-big.np{color:var(--crimson)}
+.res-sub{color:var(--muted);font-size:.85rem}
+.res-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.88rem;color:var(--muted)}
+.btn.sm{padding:.2rem .7rem;font-size:.82rem;margin-left:auto}
+.conv-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:12px}
+.conv-foot .note{margin:0}
+@media (max-width:760px){ .conv{grid-template-columns:minmax(0,1fr)} }
 </style>
 </head>
 <body>
@@ -163,8 +241,13 @@ button:focus-visible,.cell:focus-visible{outline:2px solid var(--navy);outline-o
     <div class="brand">
       <h1>Patro <span class="np">पात्रो</span></h1>
     </div>
+    <nav class="tabs" aria-label="Views">
+      <button id="tab-month">Month</button>
+      <button id="tab-year">Year</button>
+      <button id="tab-convert">Converter</button>
+    </nav>
     <div class="controls">
-      <div class="ystep">
+      <div class="ystep" id="yearCtl">
         <button id="yPrev" aria-label="Previous year">‹</button>
         <select id="yearSel" aria-label="Year"></select>
         <button id="yNext" aria-label="Next year">›</button>
@@ -175,64 +258,224 @@ button:focus-visible,.cell:focus-visible{outline:2px solid var(--navy);outline-o
 
   <div class="next" id="next" hidden></div>
 
-  <nav class="chips" id="chips" aria-label="Months"></nav>
+  <section id="view-month">
+    <nav class="chips" id="chips" aria-label="Months"></nav>
 
-  <div class="main">
-    <section class="sheet" aria-live="polite">
-      <div class="sheet-head">
-        <div class="t">
-          <h2 id="mTitle"></h2>
-          <div class="bs" id="mBs"></div>
+    <div class="main">
+      <section class="sheet" aria-live="polite">
+        <div class="sheet-head">
+          <div class="t">
+            <h2 id="mTitle"></h2>
+            <div class="bs" id="mBs"></div>
+          </div>
+          <div class="nav">
+            <button id="prev" aria-label="Previous month">‹</button>
+            <button id="nextM" aria-label="Next month">›</button>
+          </div>
         </div>
-        <div class="nav">
-          <button id="prev" aria-label="Previous month">‹</button>
-          <button id="nextM" aria-label="Next month">›</button>
-        </div>
-      </div>
-      <div class="dow" id="dow"></div>
-      <div class="grid" id="grid"></div>
-    </section>
+        <div class="dow" id="dow"></div>
+        <div class="grid" id="grid"></div>
+      </section>
 
-    <aside class="side">
-      <div class="panel detail" id="detail"></div>
-      <div class="panel">
-        <h3 id="listTitle">Holidays this month</h3>
-        <ul class="list" id="list"></ul>
-      </div>
-      <div class="panel">
-        <h3>Key</h3>
-        <div class="legend">
-          <div><span class="sw public"></span>Public holiday (incl. Dashain &amp; Tihar)</div>
-          <div><span class="sw limited"></span>Holiday for some groups or areas</div>
-          <div><span class="sw sat"></span>Saturday &amp; Sunday (weekly holidays)</div>
-          <div><span class="tag est">est.</span>Expected date; no government list yet</div>
+      <aside class="side">
+        <div class="panel detail" id="detail"></div>
+        <div class="panel">
+          <h3 id="listTitle">Holidays this month</h3>
+          <ul class="list" id="list"></ul>
         </div>
-        <p class="note">Holidays up to Chaitra 2083 (Apr 13, 2027) follow the government lists. Later dates come from published patro data, and for mid-2030 from lunar calculation, so they may shift by a day.</p>
+        <div class="panel">
+          <h3>Key</h3>
+          <div class="legend">
+            <div><span class="sw public"></span>Public holiday (incl. Dashain &amp; Tihar)</div>
+            <div><span class="sw limited"></span>Holiday for some groups or areas</div>
+            <div><span class="sw sat"></span>Saturday &amp; Sunday (weekly holidays)</div>
+            <div><span class="tag est">est.</span>Expected date; no government list yet</div>
+          </div>
+          <p class="note">Holidays up to Chaitra 2083 (Apr 13, 2027) follow the government lists. Later dates come from published patro data, and for mid-2030 from lunar calculation, so they may shift by a day.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="view-year" hidden>
+    <div class="yhead">
+      <h2 id="yTitle"></h2>
+      <div class="ystats" id="yStats"></div>
+    </div>
+    <div class="ykey">
+      <span><i class="sw public"></i>Public holiday</span>
+      <span><i class="sw limited"></i>Some groups or areas</span>
+      <span><i class="sw sat"></i>Weekend</span>
+      <span>Click a day to open it</span>
+    </div>
+    <div class="yeargrid" id="yearGrid"></div>
+    <div class="ybottom">
+      <div class="panel">
+        <h3>Long breaks</h3>
+        <p class="note" style="margin:0 0 8px">Three or more days off in a row, counting weekends and public holidays.</p>
+        <ul class="breaks" id="breaks"></ul>
       </div>
-    </aside>
-  </div>
+      <div class="panel">
+        <h3>All holidays</h3>
+        <div class="ylist" id="yList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-convert" hidden>
+    <div class="conv">
+      <div class="panel cbox">
+        <h3>BS → AD</h3>
+        <p class="ctitle">Nepali date to English date</p>
+        <div class="pick">
+          <label for="bY">Year<select id="bY"></select></label>
+          <label for="bM">Month<select id="bM"></select></label>
+          <label for="bD">Day<select id="bD"></select></label>
+        </div>
+        <div class="res" id="bRes" aria-live="polite"></div>
+      </div>
+      <div class="panel cbox">
+        <h3>AD → BS</h3>
+        <p class="ctitle">English date to Nepali date</p>
+        <div class="pick">
+          <label for="aY">Year<select id="aY"></select></label>
+          <label for="aM">Month<select id="aM"></select></label>
+          <label for="aD">Day<select id="aD"></select></label>
+        </div>
+        <div class="res" id="aRes" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="conv-foot">
+      <button class="btn" id="cvToday">Reset to today</button>
+      <p class="note">Converts any date from 2000 to 2090 BS (14 Apr 1943 to 12 Apr 2034 AD). Month lengths match Hamro Patro and Ashesh Patro.</p>
+    </div>
+  </section>
 </div>
 
 <script>
 // ---------- Bikram Sambat conversion ----------
-// Month lengths (Baisakh..Chaitra) per BS year, 2076–2087. Anchor: 2076 Poush 1 = 2019-12-17.
-// Source: Hamro Patro up to 2083 BS, Ashesh Patro from 2084 BS.
-const BS_DATA = {"2076":[0,0,0,0,0,0,0,0,29,29,30,30],"2077":[31,32,31,32,31,30,30,30,29,30,29,31],"2078":[31,31,31,32,31,31,30,29,30,29,30,30],"2079":[31,31,32,31,31,31,30,29,30,29,30,30],"2080":[31,32,31,32,31,30,30,30,29,29,30,30],"2081":[31,32,31,32,31,30,30,30,29,30,29,31],"2082":[31,31,32,31,31,31,30,29,30,29,30,30],"2083":[31,31,32,31,31,31,30,29,30,29,30,30],"2084":[31,32,31,32,31,30,30,30,29,29,30,31],"2085":[30,32,31,32,31,30,30,30,29,30,29,31],"2086":[31,31,32,31,31,31,30,29,30,29,30,30],"2087":[31,31,32,32,31,30,30,29,30,29]};
-const ANCHOR = Date.UTC(2019,11,17), ANCHOR_BS = {y:2076, m:8};
+// BS month lengths, one row per year from 2000 BS (Baisakh..Chaitra).
+// 2077–2083 match Hamro Patro, 2084–2087 match Ashesh Patro.
+const BS_START = 2000, BS_END = 2090;
+const BS_ROWS = [
+  [30,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [30,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [31,31,31,32,31,31,29,30,30,29,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [31,31,31,32,31,31,29,30,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [31,31,31,32,31,31,29,30,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,31,32,31,31,30,29,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,30],
+  [31,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,31,32,31,31,30,29,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [30,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,31,32,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [30,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [30,32,31,32,31,31,29,30,30,29,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [31,31,31,32,31,31,29,30,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [31,31,31,32,31,31,29,30,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [31,31,31,32,31,31,30,29,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,30],
+  [31,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,31,32,31,31,30,29,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,30],
+  [31,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,31,32,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [30,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [30,32,31,32,31,31,29,30,29,30,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [31,31,31,32,31,31,29,30,30,29,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [31,31,31,32,31,31,29,30,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [31,31,31,32,31,31,30,29,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,30],
+  [31,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,31,32,31,31,30,29,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,30],
+  [31,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,32,31,32,31,30,30,30,29,29,30,31],
+  [30,32,31,32,31,30,30,30,29,30,29,31],
+  [31,31,32,31,31,31,30,29,30,29,30,30],
+  [31,31,32,32,31,30,30,29,30,29,30,30],
+  [30,31,32,32,30,31,30,30,29,30,30,30],
+  [30,32,31,32,31,30,30,30,29,30,30,30],
+  [30,32,31,32,31,30,30,30,29,30,30,30]
+];
+const ANCHOR = Date.UTC(1943,3,14); // 2000 Baisakh 1 BS
 const BS_MONTHS = ["Baisakh","Jestha","Asar","Shrawan","Bhadra","Ashoj","Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"];
 const BS_MONTHS_NP = ["बैशाख","जेठ","असार","साउन","भदौ","असोज","कार्तिक","मंसिर","पुष","माघ","फागुन","चैत"];
 const NP_DIG = "०१२३४५६७८९";
-const np = n => String(n).replace(/d/g,d=>NP_DIG[d]);
+const np = n => String(n).replace(/[0-9]/g,d=>NP_DIG[d]);
 
-function toBS(y,m,d){ // m 0-based
+// day offset (from ANCHOR) of Baisakh 1 for every BS year, plus one past the end
+const YEAR_START = [0];
+BS_ROWS.forEach((r,i)=>YEAR_START.push(YEAR_START[i] + r.reduce((a,b)=>a+b,0)));
+const bsMonthLen = (y,m) => BS_ROWS[y-BS_START][m];
+const AD_MIN = new Date(ANCHOR), AD_MAX = new Date(ANCHOR + (YEAR_START[YEAR_START.length-1]-1)*864e5);
+
+function toBS(y,m,d){ // AD (m 0-based) -> {y,m,d} BS (m 0-based), or null if out of range
   let days = Math.round((Date.UTC(y,m,d)-ANCHOR)/864e5);
-  let by = ANCHOR_BS.y, bm = ANCHOR_BS.m;
-  while (true){
-    const len = BS_DATA[by][bm];
-    if (days < len) return {y:by, m:bm, d:days+1};
-    days -= len; bm++;
-    if (bm===12){ bm=0; by++; }
-  }
+  if (days < 0 || days >= YEAR_START[YEAR_START.length-1]) return null;
+  let i = 0; while (YEAR_START[i+1] <= days) i++;
+  days -= YEAR_START[i];
+  const row = BS_ROWS[i]; let bm = 0;
+  while (days >= row[bm]) { days -= row[bm]; bm++; }
+  return {y:BS_START+i, m:bm, d:days+1};
+}
+function toAD(by,bm,bd){ // BS (m 0-based) -> Date (UTC midnight), or null if invalid
+  if (by<BS_START || by>BS_END || bd<1 || bd>bsMonthLen(by,bm)) return null;
+  let days = YEAR_START[by-BS_START];
+  for (let i=0;i<bm;i++) days += BS_ROWS[by-BS_START][i];
+  return new Date(ANCHOR + (days+bd-1)*864e5);
 }
 
 // ---------- Holidays ----------
@@ -746,6 +989,8 @@ Object.values(byDate).forEach(a=>a.sort((x,y)=>RANK[x.t]-RANK[y.t]));
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const MON = MONTHS.map(m=>m.slice(0,3));
 const DOW = [["Sun","आइत"],["Mon","सोम"],["Tue","मंगल"],["Wed","बुध"],["Thu","बिही"],["Fri","शुक्र"],["Sat","शनि"]];
+const WEEKDAY_EN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const WEEKDAY_NP =["आइतबार","सोमबार","मंगलबार","बुधबार","बिहीबार","शुक्रबार","शनिबार"];
 const key = (y,m,d)=>`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
 const $ = id=>document.getElementById(id);
 
@@ -754,29 +999,45 @@ const TODAY = key(now.getFullYear(), now.getMonth(), now.getDate());
 const Y0 = 2020, Y1 = 2030;
 const inRange = now.getFullYear()>=Y0 && now.getFullYear()<=Y1;
 
-let state = {y: inRange?now.getFullYear():Y0, m: inRange?now.getMonth():0, sel: inRange?TODAY:Y0+"-01-01"};
-try{ const s=JSON.parse(localStorage.getItem("patro-view")); if(s && s.y>=Y0 && s.y<=Y1 && !inRange) state={...state,...s}; }catch(e){}
+let state = {y: inRange?now.getFullYear():Y0, m: inRange?now.getMonth():0, sel: inRange?TODAY:Y0+"-01-01", view:"month"};
+try{ const s=JSON.parse(localStorage.getItem("patro-view")); if(s && s.y>=Y0 && s.y<=Y1 && !inRange) state={...state,y:s.y,m:s.m}; }catch(e){}
 
 $("dow").innerHTML = DOW.map(([e,n])=>`<div><span>${e}</span><span class="n">${n}</span></div>`).join("");
 
 function bsLabel(b){ return `${BS_MONTHS_NP[b.m]} ${np(b.d)}, ${np(b.y)}`; }
+function tagName(t){ return {public:"Public holiday",limited:"Limited",obs:"Festival"}[t]; }
+const isOff = k => { const [y,m,d]=k.split("-").map(Number); const w=new Date(y,m-1,d).getDay(); return w===0||w===6||(byDate[k]||[]).some(h=>h.t==="public"); };
+
+// ---------- view switching ----------
+function setView(v){
+  state.view = v;
+  ["month","year","convert"].forEach(n=>{ $("view-"+n).hidden = n!==v; $("tab-"+n).setAttribute("aria-current", n===v); });
+  $("yearCtl").hidden = v==="convert";
+  try{ history.replaceState(null,"", v==="month" ? location.pathname : "#"+v); }catch(e){}
+  render();
+}
 
 function render(){
-  const {y,m} = state;
-  try{ localStorage.setItem("patro-view", JSON.stringify({y,m})); }catch(e){}
+  const {y} = state;
+  try{ localStorage.setItem("patro-view", JSON.stringify({y,m:state.m})); }catch(e){}
   $("yearSel").value = y;
   $("yPrev").disabled = y===Y0;
   $("yNext").disabled = y===Y1;
+  if(state.view==="month") renderMonth();
+  if(state.view==="year") renderYear();
+}
+
+// ---------- month view ----------
+function renderMonth(){
+  const {y,m} = state;
   $("prev").disabled = (y===Y0 && m===0);
   $("nextM").disabled = (y===Y1 && m===11);
 
-  // chips
   $("chips").innerHTML = MON.map((mn,i)=>{
     const a = toBS(y,i,1), b = toBS(y,i,new Date(y,i+1,0).getDate());
     return `<button data-m="${i}" ${i===m?'aria-current="true"':''}><span>${mn}</span><span class="bsm">${BS_MONTHS_NP[a.m]}–${BS_MONTHS_NP[b.m]}</span></button>`;
   }).join("");
 
-  // title + BS span
   const days = new Date(y,m+1,0).getDate();
   const b1 = toBS(y,m,1), b2 = toBS(y,m,days);
   $("mTitle").innerHTML = `${MONTHS[m]}<span>${y}</span>`;
@@ -784,7 +1045,6 @@ function render(){
     ? `${BS_MONTHS_NP[b1.m]} – ${BS_MONTHS_NP[b2.m]} ${np(b1.y)} · ${BS_MONTHS[b1.m]} – ${BS_MONTHS[b2.m]} ${b1.y} BS`
     : `${BS_MONTHS_NP[b1.m]} ${np(b1.y)} – ${BS_MONTHS_NP[b2.m]} ${np(b2.y)} · ${BS_MONTHS[b1.m]} ${b1.y} – ${BS_MONTHS[b2.m]} ${b2.y} BS`;
 
-  // grid
   const first = new Date(y,m,1).getDay();
   let html = "";
   for(let i=0;i<first;i++) html += `<div class="cell pad" aria-hidden="true"></div>`;
@@ -808,7 +1068,6 @@ function render(){
   for(let i=0;i<tail;i++) html += `<div class="cell pad" aria-hidden="true"></div>`;
   $("grid").innerHTML = html;
 
-  // month list
   const ks = Object.keys(byDate).filter(k=>k.startsWith(`${y}-${String(m+1).padStart(2,"0")}`)).sort();
   $("listTitle").textContent = `Holidays in ${MONTHS[m]}`;
   $("list").innerHTML = ks.length ? ks.flatMap(k=>byDate[k].map(h=>{
@@ -823,8 +1082,6 @@ function render(){
   renderDetail();
 }
 
-function tagName(t){ return {major:"Dashain/Tihar",public:"Public holiday",limited:"Limited",obs:"Festival"}[t]; }
-
 function renderDetail(){
   const k = state.sel; const [y,mm,d] = k.split("-").map(Number); const m=mm-1;
   const b = toBS(y,m,d), hs = byDate[k]||[];
@@ -832,17 +1089,125 @@ function renderDetail(){
   const wdName = wd.toLocaleDateString("en-GB",{weekday:"long"});
   $("detail").innerHTML = `<h3>${k===TODAY?"Today":"Selected day"}</h3>
     <div class="big">${wdName}, ${MON[m]} ${d}, ${y}</div>
-    <div class="bsfull">${bsLabel(b)} · ${DOW[wd.getDay()][1]}बार</div>
+    <div class="bsfull">${bsLabel(b)} · ${WEEKDAY_NP[wd.getDay()]}</div>
     <div class="bsrom">${BS_MONTHS[b.m]} ${b.d}, ${b.y} BS</div>
     ${hs.length?`<ul class="list" style="margin-top:8px">${hs.map(h=>`<li style="cursor:default;grid-template-columns:1fr"><div><div class="nm">${h.n}</div><div class="sub">${h.np}</div><div style="margin-top:3px"><span class="tag ${h.t}">${tagName(h.t)}</span>${h.note?`<span class="sub">${h.note}</span>`:""}${h.est?` <span class="tag est">est.</span>`:""}</div></div></li>`).join("")}</ul>`
       : `<p class="empty" style="margin-top:8px">${wd.getDay()===6?"Saturday, weekly holiday.":wd.getDay()===0?"Sunday, weekly holiday.":"Regular working day."}</p>`}`;
 }
 
+// ---------- year view ----------
+function longBreaks(y){ // runs of 3+ consecutive days off (weekends + public holidays)
+  const out = []; let run = [];
+  const flush = ()=>{ if(run.length>=3 && run.some(k=>(byDate[k]||[]).some(h=>h.t==="public"))) out.push(run); run=[]; };
+  for(let t=Date.UTC(y,0,1)-3*864e5; t<=Date.UTC(y,11,31)+3*864e5; t+=864e5){
+    const dt=new Date(t), k=key(dt.getUTCFullYear(),dt.getUTCMonth(),dt.getUTCDate());
+    if(isOff(k)) run.push(k); else flush();
+  }
+  flush();
+  return out.filter(r=>r.some(k=>k.startsWith(y+"-")));
+}
+
+function renderYear(){
+  const y = state.y;
+  $("yTitle").innerHTML = `${y}<span>${(()=>{const a=toBS(y,0,1),b=toBS(y,11,31);return `${np(a.y)} – ${np(b.y)} · ${a.y}–${b.y} BS`;})()}</span>`;
+  const yearKeys = Object.keys(byDate).filter(k=>k.startsWith(y+"-")).sort();
+  const pubWeekday = yearKeys.filter(k=>{const w=new Date(k+"T00:00").getDay(); return w!==0&&w!==6 && byDate[k].some(h=>h.t==="public");}).length;
+  const breaks = longBreaks(y);
+  $("yStats").innerHTML = `
+    <div><b>${pubWeekday}</b><span>public holidays on weekdays</span></div>
+    <div><b>${breaks.length}</b><span>breaks of 3+ days off</span></div>
+    <div><b>${yearKeys.filter(k=>byDate[k].some(h=>h.est)).length ? "Some" : "All"}</b><span>${yearKeys.some(k=>byDate[k].some(h=>h.est)) ? "dates estimated" : "dates from government lists"}</span></div>`;
+
+  let html = "";
+  for(let m=0;m<12;m++){
+    const days = new Date(y,m+1,0).getDate(), first = new Date(y,m,1).getDay();
+    const a = toBS(y,m,1), b = toBS(y,m,days);
+    let cells = "";
+    for(let i=0;i<first;i++) cells += `<span></span>`;
+    for(let d=1; d<=days; d++){
+      const k=key(y,m,d), hs=byDate[k]||[], w=(first+d-1)%7, bs=toBS(y,m,d);
+      const cls=["md"]; if(w===0||w===6) cls.push("we"); if(hs.length) cls.push(hs[0].t); if(k===TODAY) cls.push("today");
+      const tip = `${MON[m]} ${d} · ${BS_MONTHS[bs.m]} ${bs.d}${hs.length?" · "+hs.map(h=>h.n).join(", "):""}`;
+      cells += `<button class="${cls.join(" ")}" data-k="${k}" title="${tip}" aria-label="${tip}">${d}<small>${np(bs.d)}</small></button>`;
+    }
+    html += `<div class="mini"><button class="mini-h" data-m="${m}"><span>${MONTHS[m]}</span><small>${BS_MONTHS_NP[a.m]}–${BS_MONTHS_NP[b.m]}</small></button>
+      <div class="mini-dow">${DOW.map(d=>`<span>${d[0][0]}</span>`).join("")}</div><div class="mini-grid">${cells}</div></div>`;
+  }
+  $("yearGrid").innerHTML = html;
+
+  $("breaks").innerHTML = breaks.length ? breaks.map(r=>{
+    const f=r[0], l=r[r.length-1], [fy,fm,fd]=f.split("-").map(Number), [ly,lm,ld]=l.split("-").map(Number);
+    const names=[...new Set(r.flatMap(k=>(byDate[k]||[]).filter(h=>h.t==="public").map(h=>h.n.split(" · ")[0])))];
+    const range = fm===lm ? `${MON[fm-1]} ${fd}–${ld}` : `${MON[fm-1]} ${fd} – ${MON[lm-1]} ${ld}`;
+    return `<li data-k="${f}"><b>${r.length} days</b><span class="rg">${range}</span><span class="why">${names.slice(0,3).join(", ")}${names.length>3?"…":""}</span></li>`;
+  }).join("") : `<li class="empty">No long breaks this year.</li>`;
+
+  $("yList").innerHTML = MONTHS.map((mn,m)=>{
+    const ks = yearKeys.filter(k=>+k.slice(5,7)===m+1 && byDate[k].some(h=>h.t!=="obs"));
+    if(!ks.length) return "";
+    return `<div class="ym"><h4>${mn}</h4><ul>${ks.map(k=>{const h=byDate[k].find(h=>h.t!=="obs"); const d=+k.slice(8);
+      return `<li data-k="${k}" class="${h.t}"><span class="d">${d}</span><span>${h.n}${h.est?' <span class="tag est">est.</span>':""}</span></li>`;}).join("")}</ul></div>`;
+  }).join("");
+}
+
+// ---------- converter ----------
+const AD_Y0 = AD_MIN.getUTCFullYear(), AD_Y1 = AD_MAX.getUTCFullYear();
+function fillSel(sel, items, val){ sel.innerHTML = items.map(([v,t])=>`<option value="${v}">${t}</option>`).join(""); if(val!=null) sel.value = val; }
+function relDays(dt){
+  const diff = Math.round((dt - Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
+  if(diff===0) return "Today"; if(diff===1) return "Tomorrow"; if(diff===-1) return "Yesterday";
+  const abs=Math.abs(diff), yrs=Math.floor(abs/365.2425);
+  const span = abs>=730 ? `${abs.toLocaleString()} days (about ${yrs} years)` : `${abs.toLocaleString()} days`;
+  return diff>0 ? `In ${span}` : `${span} ago`;
+}
+function resultHTML(adDate, bs){
+  const y=adDate.getUTCFullYear(), m=adDate.getUTCMonth(), d=adDate.getUTCDate(), w=adDate.getUTCDay();
+  const k=key(y,m,d), hs=byDate[k]||[];
+  const inCal = y>=Y0 && y<=Y1;
+  return `<div class="res-row"><span class="res-lab">AD</span><div><div class="res-big">${WEEKDAY_EN[w]},${d} ${MONTHS[m]} ${y}</div></div></div>
+    <div class="res-row"><span class="res-lab">BS</span><div><div class="res-big np">${np(bs.y)} ${BS_MONTHS_NP[bs.m]} ${np(bs.d)}, ${WEEKDAY_NP[w]}</div><div class="res-sub">${BS_MONTHS[bs.m]} ${bs.d}, ${bs.y} BS</div></div></div>
+    <div class="res-meta"><span>${relDays(adDate)}</span>${hs.length?`<span class="tag ${hs[0].t}">${hs.map(h=>h.n).join(" · ")}</span>`:""}
+    ${inCal?`<button class="btn sm" data-k="${k}">Open in calendar</button>`:""}</div>`;
+}
+
+const cv = { bY:$("bY"), bM:$("bM"), bD:$("bD"), aY:$("aY"), aM:$("aM"), aD:$("aD") };
+function initConverter(){
+  const t = toBS(now.getFullYear(), now.getMonth(), now.getDate()) || {y:2083,m:0,d:1};
+  fillSel(cv.bY, Array.from({length:BS_END-BS_START+1},(_,i)=>[BS_START+i, `${BS_START+i} · ${np(BS_START+i)}`]), t.y);
+  fillSel(cv.bM, BS_MONTHS.map((n,i)=>[i, `${n} · ${BS_MONTHS_NP[i]}`]), t.m);
+  fillSel(cv.aY, Array.from({length:AD_Y1-AD_Y0+1},(_,i)=>[AD_Y0+i, AD_Y0+i]), now.getFullYear());
+  fillSel(cv.aM, MONTHS.map((n,i)=>[i,n]), now.getMonth());
+  syncDays("b", t.d); syncDays("a", now.getDate());
+  convB(); convA();
+}
+function syncDays(side, want){
+  const sel = side==="b"?cv.bD:cv.aD;
+  const cur = want ?? +sel.value;
+  const len = side==="b" ? bsMonthLen(+cv.bY.value, +cv.bM.value) : new Date(+cv.aY.value, +cv.aM.value+1, 0).getDate();
+  fillSel(sel, Array.from({length:len},(_,i)=>[i+1, side==="b"?`${i+1} · ${np(i+1)}`:i+1]), Math.min(cur,len));
+}
+function convB(){
+  const ad = toAD(+cv.bY.value, +cv.bM.value, +cv.bD.value);
+  $("bRes").innerHTML = ad ? resultHTML(ad, {y:+cv.bY.value, m:+cv.bM.value, d:+cv.bD.value}) : `<p class="empty">That date is outside the supported range.</p>`;
+}
+function convA(){
+  const y=+cv.aY.value, m=+cv.aM.value, d=+cv.aD.value, bs = toBS(y,m,d);
+  $("aRes").innerHTML = bs ? resultHTML(new Date(Date.UTC(y,m,d)), bs)
+    : `<p class="empty">Pick a date between ${AD_MIN.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"})} and ${AD_MAX.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"})}.</p>`;
+}
+["bY","bM"].forEach(id=>cv[id].addEventListener("change",()=>{syncDays("b"); convB();}));
+cv.bD.addEventListener("change",convB);
+["aY","aM"].forEach(id=>cv[id].addEventListener("change",()=>{syncDays("a"); convA();}));
+cv.aD.addEventListener("change",convA);
+$("cvToday").onclick = initConverter;
+$("view-convert").addEventListener("click",e=>{const b=e.target.closest("button[data-k]"); if(b) go(b.dataset.k);});
+
+// ---------- next holiday banner ----------
 function renderNext(){
   if(!inRange) return;
-  const up = Object.keys(byDate).filter(k=>k>=TODAY && byDate[k].some(h=>h.t==="major"||h.t==="public")).sort()[0];
+  const up = Object.keys(byDate).filter(k=>k>=TODAY && byDate[k].some(h=>h.t==="public")).sort()[0];
   if(!up) return;
-  const h = byDate[up].find(h=>h.t==="major"||h.t==="public");
+  const h = byDate[up].find(h=>h.t==="public");
   const [y,m,d] = up.split("-").map(Number);
   const diff = Math.round((Date.UTC(y,m-1,d)-Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()))/864e5);
   const b = toBS(y,m-1,d);
@@ -852,8 +1217,10 @@ function renderNext(){
   $("next").onclick = ()=>go(up);
 }
 
-function go(k){ const [y,m]=k.split("-").map(Number); state={y,m:m-1,sel:k}; render(); }
+function go(k){ const [y,m]=k.split("-").map(Number); state.y=y; state.m=m-1; state.sel=k; setView("month"); }
 
+// ---------- events ----------
+["month","year","convert"].forEach(v=>$("tab-"+v).onclick=()=>setView(v));
 $("chips").addEventListener("click",e=>{const b=e.target.closest("button"); if(b){state.m=+b.dataset.m; render();}});
 for(let y=Y0;y<=Y1;y++) $("yearSel").add(new Option(y,y));
 $("yearSel").addEventListener("change",e=>{state.y=+e.target.value; render();});
@@ -861,17 +1228,28 @@ $("yPrev").onclick=()=>{ if(state.y>Y0){state.y--; render();} };
 $("yNext").onclick=()=>{ if(state.y<Y1){state.y++; render();} };
 $("prev").onclick=()=>{ if(state.m===0){state.y--;state.m=11}else state.m--; render(); };
 $("nextM").onclick=()=>{ if(state.m===11){state.y++;state.m=0}else state.m++; render(); };
-$("todayBtn").onclick=()=>{ inRange ? go(TODAY) : go(Y0+"-01-01"); };
+$("todayBtn").onclick=()=>{ if(state.view==="year"){ state.y = inRange?now.getFullYear():Y0; render(); } else go(inRange ? TODAY : Y0+"-01-01"); };
 $("grid").addEventListener("click",e=>{const c=e.target.closest(".cell[data-k]"); if(c){state.sel=c.dataset.k; render();}});
 $("list").addEventListener("click",e=>{const li=e.target.closest("li[data-k]"); if(li){state.sel=li.dataset.k; render();}});
+$("view-year").addEventListener("click",e=>{
+  const h=e.target.closest(".mini-h"); if(h){ state.m=+h.dataset.m; state.sel=key(state.y,state.m,1); setView("month"); return; }
+  const t=e.target.closest("[data-k]"); if(t) go(t.dataset.k);
+});
 document.addEventListener("keydown",e=>{
-  if(e.target.closest("input,textarea")) return;
-  if(e.key==="ArrowLeft" && !$("prev").disabled) $("prev").click();
-  if(e.key==="ArrowRight" && !$("nextM").disabled) $("nextM").click();
+  if(e.target.closest("input,textarea,select")) return;
+  if(state.view==="month"){
+    if(e.key==="ArrowLeft" && !$("prev").disabled) $("prev").click();
+    if(e.key==="ArrowRight" && !$("nextM").disabled) $("nextM").click();
+  } else if(state.view==="year"){
+    if(e.key==="ArrowLeft" && !$("yPrev").disabled) $("yPrev").click();
+    if(e.key==="ArrowRight" && !$("yNext").disabled) $("yNext").click();
+  }
 });
 
 renderNext();
-render();
+initConverter();
+const startView = ({"#year":"year","#convert":"convert"})[location.hash] || "month";
+setView(startView);
 </script>
 </body>
 </html>
